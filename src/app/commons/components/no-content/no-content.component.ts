@@ -16,4 +16,5 @@ export class NoContentComponent {
 
   @Input('text') text: string = 'No hay resultados para mostrar';
   @Input('icon') icon: string = 'sentiment_dissatisfied';
+  @Input('color') color: string = 'accent';
 }

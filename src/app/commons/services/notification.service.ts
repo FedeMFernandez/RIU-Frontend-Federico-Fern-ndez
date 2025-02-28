@@ -3,16 +3,16 @@ import Swal, { SweetAlertIcon, SweetAlertResult } from "sweetalert2";
 
 @Injectable()
 export class NotificationService {
-  private readonly DefaultTitle: string = 'Aviso';
 
-  private toast: any;
+  private readonly DefaultTitle: string = 'Aviso';
+  private toast!: any;
 
   constructor() {
     this.toast = Swal.mixin({
       toast: true,
-      position: 'top-end',
+      position: 'top-right',
       showConfirmButton: false,
-      timer: 5000,
+      timer: 3000,
       timerProgressBar: true,
       didOpen: (toast:any) => {
         toast.addEventListener('mouseenter', Swal.stopTimer);
@@ -59,9 +59,9 @@ export class NotificationService {
       text: message,
       icon: 'question',
       showCancelButton: true,
-      cancelButtonColor: '#eb445a',
+      cancelButtonColor: '#ba1a1a',
       confirmButtonColor: '#005cbb',
-      confirmButtonText: 'OK',
+      confirmButtonText: 'Si',
       cancelButtonText: 'Cancelar',
     });
   }

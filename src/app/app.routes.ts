@@ -2,5 +2,5 @@ import { Routes } from '@angular/router';
 
 export const routes: Routes = [{
   path: '',
-  loadChildren: () => import('./pages/layout/layout.routes').then(m => m.routes),
+  loadChildren: () => import('./layout/layout.routes').then(m => m.routes),
 }];

@@ -14,19 +14,6 @@ export class RestService {
         private httpClient: HttpClient,
     ) { }
 
-    private urlCompose(endpoint: string): string {
-        return `${environment.apiURL}${endpoint}`;
-    }
-
-    private getHttpOptions(): Object {
-      return {
-        headers: new HttpHeaders({
-            'Content-Type': 'application/json',
-        }),
-        withCredentials: false,
-      }
-    }
-
     async get<T>(endpoint: string): Promise<T> {
       return new Promise((resolve, reject) => {
           this.httpClient.get(this.urlCompose(endpoint), this.getHttpOptions()).pipe(first()).subscribe({
@@ -61,6 +48,19 @@ export class RestService {
               error: this.errorCallback(reject),
           })
       });
+    }
+
+    private urlCompose(endpoint: string): string {
+        return `${environment.apiURL}${endpoint}`;
+    }
+
+    private getHttpOptions(): Object {
+      return {
+        headers: new HttpHeaders({
+            'Content-Type': 'application/json',
+        }),
+        withCredentials: false,
+      }
     }
 
     private successCallback<T>(resolve: any, reject: any): (data: any) => void {
