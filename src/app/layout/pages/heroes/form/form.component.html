@@ -1,0 +1,63 @@
+<section>
+  <header>
+    <h4>{{ titleLabel }} Héroe</h4>
+  </header>
+  <article>
+    <mat-card>
+      <mat-card-content>
+        <form class="d-flex flex-column" [formGroup]="form" (ngSubmit)="addEventHandler(form.value)">
+          <mat-form-field>
+            <mat-label>Nombre</mat-label>
+            <input formControlName="name" textUppercase matInput type="text">
+            @if (nameControl.value.length) {
+              <button type="button" matSuffix mat-icon-button aria-label="Clear" (click)="nameControl.setValue('')">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Poder</mat-label>
+            <input formControlName="power" matInput type="text">
+            @if (powerControl.value.length) {
+              <button type="button" matSuffix mat-icon-button aria-label="Clear" (click)="powerControl.setValue('')">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Debilidad</mat-label>
+            <input formControlName="weakness" matInput type="text">
+            @if (weaknessControl.value.length) {
+              <button type="button" matSuffix mat-icon-button aria-label="Clear" (click)="weaknessControl.setValue('')">
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+          </mat-form-field>
+          <mat-form-field>
+            <mat-label>Fecha de nacimiento</mat-label>
+            <input formControlName="birth" matInput [matDatepicker]="picker">
+            <mat-hint>DD/MM/YYYY</mat-hint>
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+          <div class="d-flex justify-content-between align-items-center gap-3 pt-3">
+            <button type="button" mat-raised-button extended routerLink="heroes" color="accent">
+              <mat-icon>arrow_back</mat-icon>
+              Cancelar
+            </button>
+            <button type="submit" class="flex-grow-1" mat-raised-button extended [disabled]="form.invalid || loading" color="primary">
+              <mat-icon>save</mat-icon>
+              Guardar
+            </button>
+            @if (id) {
+              <button type="button" mat-raised-button extended color="warn" [disabled]="loading" (click)="deleteEventHandler(form.value)">
+                <mat-icon>delete</mat-icon>
+                Borrar
+              </button>
+            }
+          </div>
+        </form>
+      </mat-card-content>
+    </mat-card>
+  </article>
+</section>

@@ -1,0 +1,90 @@
+
+<section class="d-flex flex-column gap-3">
+  <header>
+    <h4>Listado de Héroes</h4>
+    <div class="d-flex justify-content-between gap-3">
+      <mat-form-field class="flex-grow-1">
+          <mat-label>Buscar</mat-label>
+          <input [disabled]="!heroes.length" matInput type="text" [ngModel]="searchInput" (ngModelChange)="searchChangeEventHandler($event)">
+          @if (searchInput) {
+            <button matSuffix mat-icon-button aria-label="Clear" (click)="searchInput=''">
+              <mat-icon>close</mat-icon>
+            </button>
+          }
+          @if (!(dataSource && !dataSource.data.length)) {
+            <mat-hint >Búsca un héroe por id o nombre.</mat-hint>
+          }
+        </mat-form-field>
+        <button mat-fab routerLink="add">
+          <mat-icon color="primary">add</mat-icon>
+        </button>
+      </div>
+    </header>
+  <article>
+  <mat-card>
+    <mat-card-content>
+        @if (loading) {
+          <div class="d-flex justify-content-center align-items-center">
+            <mat-spinner />
+          </div>
+        } @else if (dataSource && !dataSource.data.length) {
+          <div class="d-flex justify-content-center align-items-center">
+             <app-no-content-component />
+          </div>
+        } @else {
+          <div class="w-100 overflow-auto">
+            <table mat-table matSort [dataSource]="dataSource">
+              <ng-container matColumnDef="id">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>ID</th>
+                <td mat-cell *matCellDef="let element">{{ element.id }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="name">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>Nombre</th>
+                <td mat-cell *matCellDef="let element">{{ element.name }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="power">
+                <th mat-header-cell *matHeaderCellDef>Poder</th>
+                <td mat-cell *matCellDef="let element">{{ element.power }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="weakness">
+                <th mat-header-cell *matHeaderCellDef>Debilidad</th>
+                <td mat-cell *matCellDef="let element">{{ element.weakness }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="birth">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>Fecha de nacimiento</th>
+                <td mat-cell *matCellDef="let element">{{ element.birth | momentFormat:'DD/MM/YYYY' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="createdAt">
+                <th mat-header-cell mat-sort-header *matHeaderCellDef>Creado</th>
+                <td mat-cell *matCellDef="let element">{{ element.createdAt | momentFormat:'DD/MM/YYYY' }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef class="text-center">Acciones</th>
+                <td mat-cell *matCellDef="let element">
+                  <div class="d-flex align-items-center justify-content-center">
+                    <button  mat-icon-button (click)="navigate(['edit', element.id], { state: { hero: element } })">
+                      <mat-icon color="primary">edit</mat-icon>
+                    </button>
+                    <button  mat-icon-button (click)="deleteEventHandler(element)">
+                      <mat-icon  color="warn">delete</mat-icon>
+                    </button>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns" class="text-uppercase"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+            </table>
+          </div>
+          <mat-paginator [pageSize]="10" [showFirstLastButtons]="true"></mat-paginator>
+        }
+      </mat-card-content>
+    </mat-card>
+  </article>
+</section>

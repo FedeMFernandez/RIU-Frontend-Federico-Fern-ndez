@@ -8,32 +8,33 @@ export class HeroService {
     private restService: RestService,
   ) { }
 
-  async get(): Promise<HeroModelDTO[]> {
+  async get(id?: number): Promise<HeroModelDTO[] | HeroModelDTO> {
     try {
-      const collection = await this.restService.get<HeroModelDTO[]>('heroes');
+      const endpoint = id ? `heroes/${id}` : 'heroes';
+      const collection = await this.restService.get<HeroModelDTO[] | HeroModelDTO>(endpoint);
       return Promise.resolve(collection);
     } catch (error: any) {
       return Promise.reject(error);
     }
   }
 
-  async post(data: any): Promise<void> {
+  async push(data: HeroModelDTO): Promise<HeroModelDTO> {
     try {
-      await this.restService.post<void>('heroes', data);
-      return Promise.resolve();
+      const response = await this.restService.post<HeroModelDTO>('heroes', data);
+      return Promise.resolve(response);
     } catch (error: any) {
       return Promise.reject(error);
     }
   }
 
-  // async update(): Promise<HeroModelDTO[]> {
-  //   try {
-  //     const collection = await this.restService.get<HeroModelDTO[]>('products');
-  //     return Promise.resolve(collection);
-  //   } catch (error: any) {
-  //     return Promise.reject(error);
-  //   }
-  // }
+  async update(id: number, data: HeroModelDTO): Promise<void> {
+    try {
+       await this.restService.put<void>( `heroes/${id}`, data);
+      return Promise.resolve();
+    } catch (error: any) {
+      return Promise.reject(error);
+    }
+  }
 
   async delete(id: number): Promise<void> {
     try {
@@ -43,6 +44,7 @@ export class HeroService {
       return Promise.reject(error);
     }
   }
+
 }
 
 export interface HeroModelDTO {

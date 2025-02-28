@@ -8,7 +8,7 @@ describe('LayoutComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LayoutComponent]
+      imports: [LayoutComponent],
     })
     .compileComponents();
 
@@ -19,5 +19,17 @@ describe('LayoutComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should render mat-progress-bar', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    fixture.componentInstance.progressBar = true;
+    fixture.detectChanges();
+    expect(compiled.querySelector('mat-progress-bar')).toBeTruthy();
+  });
+
+  it('should render router-outlet', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
 });
