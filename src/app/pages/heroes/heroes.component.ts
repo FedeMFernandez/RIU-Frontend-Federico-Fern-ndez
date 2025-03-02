@@ -1,5 +1,5 @@
-import { Component, OnInit, ViewChild, Input, ChangeDetectorRef, AfterViewChecked } from '@angular/core';
-import { NavigationExtras, Router, RouterModule, ActivatedRoute } from '@angular/router';
+import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Router, RouterModule, ActivatedRoute, RouterLink } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { FormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -10,15 +10,15 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { NoContentComponent } from 'src/app/commons/components/no-content/no-content.component';
 import { MomentFormatPipe } from 'src/app/commons/pipes/moment-format.pipe';
-import { HeroService, HeroModelDTO } from 'src/app/commons/services/hero.service';
 import { NotificationService } from 'src/app/commons/services/notification.service';
 import { MatSort, MatSortModule } from '@angular/material/sort';
+import { HeroService, HeroModelDTO } from 'src/app/commons/services/hero.service';
 
 @Component({
   selector: 'app-heroes',
   standalone: true,
   imports: [
-    RouterModule,
+    RouterLink,
     FormsModule,
     MatTableModule,
     MatInputModule,
@@ -41,39 +41,25 @@ import { MatSort, MatSortModule } from '@angular/material/sort';
 })
 export class HeroesComponent implements OnInit {
 
-  //#region Template bindings
   @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
-    if (!this.dataSource) { return; }
     this.dataSource.paginator = paginator;
   }
+
   @ViewChild(MatSort) set sort(sort: MatSort) {
-    if (!this.dataSource) { return; }
     this.dataSource.sort = sort;
   }
-  //#endregion
 
-  //region Inputs/Outputs
   @Input() private set _dataSource(value: Hero[]) {
-    if (this.dataSource) {
-      this.dataSource.data = value;
-    } else {
-      this.dataSource = new MatTableDataSource(value);
-    }
+    this.dataSource.data = value;
   }
-  //#endregion
 
-  //#region Public vars
   loading: boolean = false;
   displayedColumns: string[] = ['id', 'name', 'power', 'weakness', 'birth', 'createdAt', 'actions'];
   searchInput: string = '';
-  dataSource!: MatTableDataSource<Hero>;
+  dataSource: MatTableDataSource<Hero> = new MatTableDataSource<Hero>([]);
   heroes: Hero[] = [];
-  //#endregion
 
-  //#region Lyfecicle
   constructor(
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
     private heroService: HeroService,
     private notificationService: NotificationService,
   ) { }
@@ -81,23 +67,12 @@ export class HeroesComponent implements OnInit {
   async ngOnInit(): Promise<void> {
     await this.fetchList();
   }
-  //#endregion
 
-  //#region Public methods
   async deleteEventHandler(hero: Hero): Promise<void> {
     const confirm = await this.notificationService.showQuestion(`¿Desea borrar al héroe ${hero.name}?`);
     if (confirm) {
       await this.delete(hero);
-      await this.fetchList();
     }
-  }
-
-  navigate(url: any[], extras?: NavigationExtras): void {
-    extras = {
-      ...extras,
-      relativeTo: this.activatedRoute,
-    }
-    this.router.navigate(url, extras);
   }
 
   searchChangeEventHandler(filter: string): void {
@@ -106,11 +81,9 @@ export class HeroesComponent implements OnInit {
       this._dataSource = this.heroes;
       return;
     }
-    this._dataSource = this.heroes.filter((element: Hero) => (element.name.toUpperCase().includes(filter.toUpperCase()) || element.id.toString() === filter));
+    this._dataSource = this.heroes.filter((element: Hero) => (element.name.toLowerCase().includes(filter.toLowerCase()) || element.id.toString() === filter));
   }
-  //#endregion
 
-  //#region Private methods
   private async fetchList(): Promise<void> {
     try {
       this.loading = true;
@@ -118,7 +91,7 @@ export class HeroesComponent implements OnInit {
       this.heroes = response.map((hero: HeroModelDTO) => <Hero>{ ...hero });
       this._dataSource = this.heroes;
     } catch (error: any) {
-      this.notificationService.showError('¡Ha ocurrido un error!');
+      console.log(error);
     } finally {
       this.loading = false;
     }
@@ -127,12 +100,12 @@ export class HeroesComponent implements OnInit {
   private async delete(hero: Hero): Promise<void> {
     try {
       await this.heroService.delete(hero.id);
-      this.notificationService.show(`Se ha borrado el héroe ${hero.name}`, 'success');
+      this.notificationService.show(`Se ha borrado el héroe ${hero.name}`);
+      await this.fetchList();
     } catch (error: any) {
-      this.notificationService.showError('¡Ha ocurrido un error!');
+      this.notificationService.show('¡Ha ocurrido un error!', 'error');
     }
   }
-  //#endregion
 
 }
 

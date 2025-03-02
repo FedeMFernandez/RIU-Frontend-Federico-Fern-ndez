@@ -20,4 +20,9 @@ describe('NoContentComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should render mat-icon', () => {
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('mat-icon')).toBeTruthy();
+  });
 });

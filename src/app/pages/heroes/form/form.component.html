@@ -1,11 +1,11 @@
 <section>
   <header>
-    <h4>{{ titleLabel }} Héroe</h4>
+    <h4>{{ isEdition ? 'Editar' : 'Añadir' }} Héroe</h4>
   </header>
   <article>
     <mat-card>
       <mat-card-content>
-        <form class="d-flex flex-column" [formGroup]="form" (ngSubmit)="addEventHandler(form.value)">
+        <form class="d-flex flex-column" [formGroup]="form" (ngSubmit)="submitEventHandler(form.value)">
           <mat-form-field>
             <mat-label>Nombre</mat-label>
             <input formControlName="name" textUppercase matInput type="text">
@@ -49,8 +49,8 @@
               <mat-icon>save</mat-icon>
               Guardar
             </button>
-            @if (id) {
-              <button type="button" mat-raised-button extended color="warn" [disabled]="loading" (click)="deleteEventHandler(form.value)">
+            @if (this.isEdition) {
+              <button type="button" mat-raised-button extended color="warn" [disabled]="loading" (click)="deleteEventHandler()">
                 <mat-icon>delete</mat-icon>
                 Borrar
               </button>

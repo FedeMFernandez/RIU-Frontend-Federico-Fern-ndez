@@ -5,15 +5,13 @@
     <div class="d-flex justify-content-between gap-3">
       <mat-form-field class="flex-grow-1">
           <mat-label>Buscar</mat-label>
-          <input [disabled]="!heroes.length" matInput type="text" [ngModel]="searchInput" (ngModelChange)="searchChangeEventHandler($event)">
+          <input matInput type="text" [ngModel]="searchInput" (ngModelChange)="searchChangeEventHandler($event)">
           @if (searchInput) {
             <button matSuffix mat-icon-button aria-label="Clear" (click)="searchInput=''">
               <mat-icon>close</mat-icon>
             </button>
           }
-          @if (!(dataSource && !dataSource.data.length)) {
-            <mat-hint >Búsca un héroe por id o nombre.</mat-hint>
-          }
+          <mat-hint >Búsca un héroe por id o nombre.</mat-hint>
         </mat-form-field>
         <button mat-fab routerLink="add">
           <mat-icon color="primary">add</mat-icon>
@@ -27,7 +25,7 @@
           <div class="d-flex justify-content-center align-items-center">
             <mat-spinner />
           </div>
-        } @else if (dataSource && !dataSource.data.length) {
+        } @else if (!dataSource.data.length) {
           <div class="d-flex justify-content-center align-items-center">
              <app-no-content-component />
           </div>
@@ -68,10 +66,10 @@
                 <th mat-header-cell *matHeaderCellDef class="text-center">Acciones</th>
                 <td mat-cell *matCellDef="let element">
                   <div class="d-flex align-items-center justify-content-center">
-                    <button  mat-icon-button (click)="navigate(['edit', element.id], { state: { hero: element } })">
+                    <button mat-icon-button [routerLink]="['edit', element.id]">
                       <mat-icon color="primary">edit</mat-icon>
                     </button>
-                    <button  mat-icon-button (click)="deleteEventHandler(element)">
+                    <button mat-icon-button (click)="deleteEventHandler(element)">
                       <mat-icon  color="warn">delete</mat-icon>
                     </button>
                   </div>

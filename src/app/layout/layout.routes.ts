@@ -8,7 +8,7 @@ export const routes: Routes = [
     children: [
       {
         path: 'heroes',
-        loadChildren: () => import('./pages/heroes/heroes.routes').then(m => m.routes),
+        loadChildren: () => import('../pages/heroes/heroes.routes').then(m => m.routes),
       },
       {
         path: '**',
