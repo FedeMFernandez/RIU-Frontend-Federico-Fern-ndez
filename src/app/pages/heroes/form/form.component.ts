@@ -9,14 +9,14 @@ import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { TextUppercaseDirective } from 'src/app/commons/directives/upper-text.directive';
+import { TextUppercaseDirective } from 'src/app/commons/directives/text-uppercase.directive';
 import Patterns from 'src/app/commons/constants/patterns.constants';
-import { HeroService, HeroModelDTO } from 'src/app/commons/services/hero.service';
 import { NotificationService } from 'src/app/commons/services/notification.service';
 import { LoadingService } from 'src/app/commons/services/loading.service';
 import { Subscription } from 'rxjs';
 import { Moment } from 'moment';
 import moment from 'moment';
+import { HeroService, HeroModelDTO } from 'src/app/commons/services/hero.service';
 
 @Component({
   selector: 'app-form',
@@ -43,28 +43,21 @@ import moment from 'moment';
 })
 export class FormComponent implements OnInit {
 
-  //#region Public vars
-  id: number = 0;
   loading: boolean = false;
   form!: FormGroup;
-  nameControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_UPPERCASE_WITH_SPACES_AND_DOTS)]);
+  nameControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_WITH_SPACES_AND_DOTS)]);
   powerControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_WITH_SPACES_AND_DOTS)]);
   weaknessControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_WITH_SPACES_AND_DOTS)]);
   birthControl: FormControl = new FormControl(null, [Validators.required]);
-  titleLabel: string = 'Añadir';
-  //#endregion
+  isEdition: boolean = false;
 
-  //#region Private vars
-  private progressBarSubscription!: Subscription;
-  //#endregion
+  private heroID: number = 0;
 
-  //#region Lifecycle
   constructor(
     private router: Router,
     private activatedRoute: ActivatedRoute,
     private heroService: HeroService,
     private notificationService: NotificationService,
-    private progressBarService: LoadingService,
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -75,77 +68,79 @@ export class FormComponent implements OnInit {
       birth: this.birthControl,
     });
 
-    this.progressBarSubscription = this.progressBarService.loading.subscribe((value) => {
-      this.loading = value;
-    });
-
-    this.id = parseInt(this.activatedRoute.snapshot.paramMap.get('id') as string);
-    if (this.id) {
-      this.titleLabel = 'Editar';
-      await this.fetch(this.id);
+    const idParam = this.activatedRoute.snapshot.paramMap.get('id');
+    if (idParam) {
+      this.heroID = parseInt(idParam);
+      this.isEdition = true;
+      await this.fetch(this.heroID);
     }
   }
 
-  ngOnDestroy(): void {
-    this.progressBarSubscription.unsubscribe();
-  }
-  //#endregion
-
-  //#region Public methods
-  async addEventHandler(values: Form): Promise<void> {
-    if (this.id) {
+  async submitEventHandler(values: Form): Promise<void> {
+    if (this.isEdition) {
       await this.update(values);
       return;
     }
     await this.add(values);
   }
 
-  async deleteEventHandler(values: Form): Promise<void> {
-    if (!this.id) { return; }
-    const confirm = await this.notificationService.showQuestion(`¿Desea borrar al héroe ${values.name}?`);
+  async deleteEventHandler(): Promise<void> {
+    if (!this.isEdition) { return; }
+    const hero = this.form.value;
+    const confirm = await this.notificationService.showQuestion(`¿Desea borrar al héroe ${hero.name}?`);
     if (confirm) {
-      await this.delete(values);
+      await this.delete(hero);
     }
   }
-  //#endregion
 
-  //#region Private methods
   private async fetch(id: number): Promise<void> {
     try {
+      this.loading = true;
       const response = await this.heroService.get(id) as HeroModelDTO;
       this.form.setValue(this.fromHeroModelDTO(response));
     } catch (error: any) {
-      this.notificationService.showError('¡Ha ocurrido un error!');
+      this.notificationService.show('¡Ha ocurrido un error!', 'error');
+    } finally {
+      this.loading = false;
     }
   }
 
   private async add(values: Form): Promise<void> {
     try {
+      this.loading = true;
       await this.heroService.push(this.toHeroModelDTO(values));
-      this.notificationService.show(`Se ha guardado el héroe ${values.name}`, 'success');
+      this.notificationService.show(`Se ha guardado el héroe ${values.name}`);
       this.router.navigate(['heroes']);
     } catch (error: any) {
-      this.notificationService.showError('¡Ha ocurrido un error!');
+      this.notificationService.show('¡Ha ocurrido un error!', 'error');
+    } finally {
+      this.loading = false;
     }
   }
 
   private async update(values: Form): Promise<void> {
     try {
-      await this.heroService.update(this.id, this.toHeroModelDTO(values));
-      this.notificationService.show(`Se ha actualizado el héroe ${values.name}`, 'success');
+      this.loading = true;
+      await this.heroService.update(this.heroID, this.toHeroModelDTO(values));
+      this.notificationService.show(`Se ha actualizado el héroe ${values.name}`);
       this.router.navigate(['heroes']);
     } catch (error: any) {
-      this.notificationService.showError('¡Ha ocurrido un error!');
+      this.notificationService.show('¡Ha ocurrido un error!', 'error');
+    } finally {
+      this.loading = false;
     }
   }
 
   private async delete(values: Form): Promise<void> {
     try {
-      await this.heroService.delete(this.id);
+      this.loading = true;
+      await this.heroService.delete(this.heroID);
       this.router.navigate(['heroes']);
-      this.notificationService.show(`Se ha borrado el héroe ${values.name}`, 'success');
+      this.notificationService.show(`Se ha borrado el héroe ${values.name}`);
     } catch (error: any) {
-      this.notificationService.showError('¡Ha ocurrido un error!');
+      this.notificationService.show('¡Ha ocurrido un error!', 'error');
+    } finally {
+      this.loading = false;
     }
   }
 
@@ -164,7 +159,6 @@ export class FormComponent implements OnInit {
       birth: values.birth.unix(),
     };
   }
-  //#endregion
 }
 interface Form {
   name: string;

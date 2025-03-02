@@ -18,23 +18,17 @@ import { Subscription } from 'rxjs';
 })
 export class LayoutComponent implements OnInit, OnDestroy {
 
-  //#region Public vars
-  progressBar: boolean = false;
-  //#endregion
+  loading: boolean = false;
+  private loadingSubscription!: Subscription;
 
-  //#region Private vars
-  private progressBarSubscription!: Subscription;
-  //#endregion
-
-  //#region Lyfecicle
   constructor(
-    private progressBarService: LoadingService,
+    private loadingService: LoadingService,
     private changeDetectorRef: ChangeDetectorRef,
   ) { }
 
   ngOnInit(): void {
-    this.progressBarSubscription = this.progressBarService.loading.subscribe((value) => {
-      this.progressBar = value;
+    this.loadingSubscription = this.loadingService.loading.subscribe((value: boolean) => {
+      this.loading = value;
     });
   }
 
@@ -43,7 +37,7 @@ export class LayoutComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.progressBarSubscription.unsubscribe();
+    this.loadingSubscription.unsubscribe();
   }
-  //#endregion
- }
+
+}

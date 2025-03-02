@@ -1,9 +1,8 @@
 
 import { HttpClient, HttpErrorResponse, HttpHeaders } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { first } from "rxjs";
+import { take } from "rxjs";
 import { environment } from "../../../environments/environment";
-
 
 @Injectable({
     providedIn: 'root',
@@ -16,7 +15,7 @@ export class RestService {
 
     async get<T>(endpoint: string): Promise<T> {
       return new Promise((resolve, reject) => {
-          this.httpClient.get(this.urlCompose(endpoint), this.getHttpOptions()).pipe(first()).subscribe({
+          this.httpClient.get(this.urlCompose(endpoint), this.getHttpOptions()).pipe(take(1)).subscribe({
               next: this.successCallback<T>(resolve, reject),
               error: this.errorCallback(reject),
           })
@@ -25,7 +24,7 @@ export class RestService {
 
     async post<T>(endpoint: string, body: any): Promise<T> {
       return new Promise((resolve, reject) => {
-          this.httpClient.post(this.urlCompose(endpoint), body, this.getHttpOptions()).pipe(first()).subscribe({
+          this.httpClient.post(this.urlCompose(endpoint), body, this.getHttpOptions()).pipe(take(1)).subscribe({
               next: this.successCallback<T>(resolve, reject),
               error: this.errorCallback(reject),
           })
@@ -34,7 +33,7 @@ export class RestService {
 
     async put<T>(endpoint: string, body: any): Promise<T> {
       return new Promise((resolve, reject) => {
-          this.httpClient.put(this.urlCompose(endpoint), body, this.getHttpOptions()).pipe(first()).subscribe({
+          this.httpClient.put(this.urlCompose(endpoint), body, this.getHttpOptions()).pipe(take(1)).subscribe({
               next: this.successCallback<T>(resolve, reject),
               error: this.errorCallback(reject),
           })
@@ -43,7 +42,7 @@ export class RestService {
 
     async delete<T>(endpoint: string): Promise<T> {
       return new Promise((resolve, reject) => {
-          this.httpClient.delete(this.urlCompose(endpoint), this.getHttpOptions()).pipe(first()).subscribe({
+          this.httpClient.delete(this.urlCompose(endpoint), this.getHttpOptions()).pipe(take(1)).subscribe({
               next: this.successCallback<T>(resolve, reject),
               error: this.errorCallback(reject),
           })
@@ -66,6 +65,9 @@ export class RestService {
     private successCallback<T>(resolve: any, reject: any): (data: any) => void {
         return (data: any) => {
             try {
+                if (!data) {
+                  throw new Error("data is invalid or can't be converted to generic type");
+                }
               resolve(data as T);
             } catch (error: any) {
               reject(error);

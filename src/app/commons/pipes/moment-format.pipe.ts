@@ -6,7 +6,7 @@ import moment from 'moment';
   standalone: true,
 })
 export class MomentFormatPipe implements PipeTransform {
-  transform(value: number, format: string = 'YYYY-MM-DD HH:mm:ss'): string {
+  transform(value: number, format: string = 'DD/MM/YYYY HH:mm:ss'): string {
     return moment.unix(value).format(format);
   }
 }

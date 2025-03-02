@@ -27,10 +27,10 @@ export class HeroService {
     }
   }
 
-  async update(id: number, data: HeroModelDTO): Promise<void> {
+  async update(id: number, data: HeroModelDTO): Promise<HeroModelDTO> {
     try {
-       await this.restService.put<void>( `heroes/${id}`, data);
-      return Promise.resolve();
+      const response = await this.restService.put<HeroModelDTO>( `heroes/${id}`, data);
+      return Promise.resolve(response);
     } catch (error: any) {
       return Promise.reject(error);
     }
