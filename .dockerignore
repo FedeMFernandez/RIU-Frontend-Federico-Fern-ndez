@@ -1,0 +1,7 @@
+.git
+.angular
+.vscode
+/coverage
+/node_modules
+.gitignore
+*.md
