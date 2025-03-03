@@ -1,0 +1,10 @@
+services:
+  front:
+    build:
+      context: . #project root
+      dockerfile: Dockerfile
+      tags:
+        - riu-challenge-front
+    container_name: riu-front
+    ports:
+      - "80:80"
