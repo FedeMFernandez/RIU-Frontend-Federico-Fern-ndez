@@ -1,4 +1,4 @@
-import { RestService } from "./rest.service";
+import { RestService } from "src/app/core/services/rest.service";
 import { HeroModelDTO, HeroService } from "./hero.service";
 
 describe('HeroService', () => {

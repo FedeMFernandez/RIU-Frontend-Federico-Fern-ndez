@@ -6,7 +6,7 @@ import Swal, { SweetAlertResult } from "sweetalert2";
 })
 export class NotificationService {
 
-  private toast!: any;
+  private toast!: typeof Swal;
 
   constructor() {
     this.toast = Swal.mixin({

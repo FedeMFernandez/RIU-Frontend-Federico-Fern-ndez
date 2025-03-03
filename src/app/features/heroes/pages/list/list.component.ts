@@ -8,14 +8,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
-import { NoContentComponent } from 'src/app/commons/components/no-content/no-content.component';
-import { MomentFormatPipe } from 'src/app/commons/pipes/moment-format.pipe';
-import { NotificationService } from 'src/app/commons/services/notification.service';
-import { MatSort, MatSortModule } from '@angular/material/sort';
-import { HeroService, HeroModelDTO } from 'src/app/commons/services/hero.service';
+import { MatSortModule, MatSort } from '@angular/material/sort';
+import { NotificationService } from 'src/app/core/services/notification.service';
+import { NoContentComponent } from 'src/app/shared/components/no-content/no-content.component';
+import { MomentFormatPipe } from 'src/app/shared/pipes/moment-format.pipe';
+import { HeroService, HeroModelDTO } from '../../services/hero.service';
 
 @Component({
-  selector: 'app-heroes',
+  selector: 'app-list',
   standalone: true,
   imports: [
     RouterLink,
@@ -36,10 +36,10 @@ import { HeroService, HeroModelDTO } from 'src/app/commons/services/hero.service
     HeroService,
     NotificationService,
   ],
-  templateUrl: './heroes.component.html',
-  styleUrl: './heroes.component.scss'
+  templateUrl: './list.component.html',
+  styleUrl: './list.component.scss'
 })
-export class HeroesComponent implements OnInit {
+export class ListComponent implements OnInit {
 
   @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
     this.dataSource.paginator = paginator;

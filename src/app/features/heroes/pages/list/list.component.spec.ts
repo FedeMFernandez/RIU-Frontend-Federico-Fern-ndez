@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HeroesComponent } from './heroes.component';
-import { provideRouter } from '@angular/router';
-import { RestService } from 'src/app/commons/services/rest.service';
+import { ListComponent } from './list.component';
+import { provideRouter, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { routes } from './heroes.routes';
-import { HeroModelDTO, HeroService } from 'src/app/commons/services/hero.service';
 import Swal, { SweetAlertResult } from 'sweetalert2';
 import { of, throwError } from 'rxjs';
 import { By } from '@angular/platform-browser';
+import { RestService } from 'src/app/core/services/rest.service';
+import { Location } from '@angular/common';
+import { HeroService, HeroModelDTO } from '../../services/hero.service';
 
-describe('HeroesComponent', () => {
-  let component: HeroesComponent;
-  let fixture: ComponentFixture<HeroesComponent>;
+describe('ListComponent', () => {
+  let component: ListComponent;
+  let fixture: ComponentFixture<ListComponent>;
   let httpClientSpy: jasmine.SpyObj<HttpClient>;
   let restServiceSpy: jasmine.SpyObj<RestService>;
   let heroServiceSpy: jasmine.SpyObj<HeroService>;
@@ -24,23 +24,62 @@ describe('HeroesComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [
-        HeroesComponent,
+        ListComponent,
         BrowserAnimationsModule,
       ],
       providers: [
-        provideRouter(routes),
+        provideRouter([
+          { path: 'add', component: {} as any },
+          { path: 'edit/:id', component: {} as any }
+        ]),
         { provide: HttpClient, useValue: httpClientSpy },
         { provide: RestService, useValue: restServiceSpy },
         { provide: HeroService, useValue: heroServiceSpy },
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(HeroesComponent);
+    fixture = TestBed.createComponent(ListComponent);
     component = fixture.componentInstance;
   });
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should navigate to /add route', async () => {
+    httpClientSpy.get.and.returnValue(of([]));
+    restServiceSpy.get.and.returnValue(Promise.resolve([]));
+    heroServiceSpy.get.and.returnValue(Promise.resolve([]));
+
+    const router = TestBed.inject(Router);
+    const location = TestBed.inject(Location);
+
+    router.initialNavigation();
+    await router.navigate(['add']);
+
+    expect(location.path()).toBe('/add');
+  });
+
+  it('should navigate to /edit/:id route', async () => {
+    const expected: HeroModelDTO[] = [{
+      id: 1,
+      name: 'FEDE',
+      power: 'Programación',
+      weakness: 'Pentium 4',
+      birth: 682743600,
+      createdAt: 682743600,
+    }];
+    httpClientSpy.get.and.returnValue(of(expected));
+    restServiceSpy.get.and.returnValue(Promise.resolve(expected));
+    heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
+
+    const router = TestBed.inject(Router);
+    const location = TestBed.inject(Location);
+
+    router.initialNavigation();
+    await router.navigate(['edit', '1']);
+
+    expect(location.path()).toBe('/edit/1');
   });
 
   it('should try to search hero with no value', async () => {

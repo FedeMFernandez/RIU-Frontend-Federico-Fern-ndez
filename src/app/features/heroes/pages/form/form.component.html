@@ -5,10 +5,13 @@
   <article>
     <mat-card>
       <mat-card-content>
-        <form class="d-flex flex-column" [formGroup]="form" (ngSubmit)="submitEventHandler(form.value)">
+        <form class="d-flex flex-column gap-2" [formGroup]="form" (ngSubmit)="submitEventHandler(form.value)">
           <mat-form-field>
             <mat-label>Nombre</mat-label>
             <input formControlName="name" textUppercase matInput type="text">
+            @if (nameControl.dirty && nameControl.invalid) {
+              <mat-hint>Texto en mayúsculas, espacios y puntos.</mat-hint>
+            }
             @if (nameControl.value.length) {
               <button type="button" matSuffix mat-icon-button aria-label="Clear" (click)="nameControl.setValue('')">
                 <mat-icon>close</mat-icon>
@@ -18,6 +21,9 @@
           <mat-form-field>
             <mat-label>Poder</mat-label>
             <input formControlName="power" matInput type="text">
+            @if (powerControl.dirty && powerControl.invalid) {
+              <mat-hint>Solo texto, espacios y puntos.</mat-hint>
+            }
             @if (powerControl.value.length) {
               <button type="button" matSuffix mat-icon-button aria-label="Clear" (click)="powerControl.setValue('')">
                 <mat-icon>close</mat-icon>
@@ -27,6 +33,9 @@
           <mat-form-field>
             <mat-label>Debilidad</mat-label>
             <input formControlName="weakness" matInput type="text">
+            @if (weaknessControl.dirty && weaknessControl.invalid) {
+              <mat-hint>Solo texto, espacios y puntos.</mat-hint>
+            }
             @if (weaknessControl.value.length) {
               <button type="button" matSuffix mat-icon-button aria-label="Clear" (click)="weaknessControl.setValue('')">
                 <mat-icon>close</mat-icon>
@@ -36,7 +45,9 @@
           <mat-form-field>
             <mat-label>Fecha de nacimiento</mat-label>
             <input formControlName="birth" matInput [matDatepicker]="picker">
-            <mat-hint>DD/MM/YYYY</mat-hint>
+            @if (birthControl.dirty && birthControl.invalid) {
+              <mat-hint>El formato debe ser {{ dateFormat }}</mat-hint>
+            }
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
           </mat-form-field>

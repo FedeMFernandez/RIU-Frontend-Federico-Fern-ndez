@@ -1,5 +1,5 @@
-import { RestService } from './rest.service';
 import { Injectable } from "@angular/core";
+import { RestService } from "src/app/core/services/rest.service";
 
 @Injectable()
 export class HeroService {

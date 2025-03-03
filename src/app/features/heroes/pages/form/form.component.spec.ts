@@ -2,18 +2,17 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormComponent } from './form.component';
 import { ActivatedRoute, provideRouter } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { RestService } from 'src/app/commons/services/rest.service';
-import { HeroModelDTO, HeroService } from 'src/app/commons/services/hero.service';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
-import Formats from 'src/app/commons/constants/formats.constants';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
-import { of, throwError } from 'rxjs';
-import Swal, { SweetAlertResult } from 'sweetalert2';
-
-import { Location } from '@angular/common';
 import moment from 'moment';
-import { LoadingService } from 'src/app/commons/services/loading.service';
+import { of, throwError } from 'rxjs';
+import { LoadingService } from 'src/app/core/services/loading.service';
+import { RestService } from 'src/app/core/services/rest.service';
+import Swal, { SweetAlertResult } from 'sweetalert2';
+import { HeroService, HeroModelDTO } from '../../services/hero.service';
+import { Location } from '@angular/common';
+import Formats from 'src/app/core/constants/formats.constants';
 
 describe('FormComponent', () => {
   let component: FormComponent;
@@ -49,7 +48,7 @@ describe('FormComponent', () => {
         { provide: LoadingService, useValue: loadingService },
         { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
         { provide: MAT_DATE_FORMATS, useValue: Formats.MOMENT_DATE_FORMAT }
-        ]
+      ]
     })
     .compileComponents();
 
@@ -59,13 +58,16 @@ describe('FormComponent', () => {
 
   it('should create', () => {
     fixture.detectChanges();
+    spyOn(Swal, 'fire').and.resolveTo(<SweetAlertResult>{
+      isDismissed: true,
+    })
     expect(component).toBeTruthy();
   });
 
   it('should show notification error while fetching heroe', async () => {
-    fixture.detectChanges();
     loadingService.loading = true;
     const expected = new Error('Error al obtener héroe');
+    fixture.detectChanges();
     heroServiceSpy.get.and.returnValue(Promise.reject(expected));
 
     await expectAsync(heroServiceSpy.get()).toBeRejectedWith(expected);

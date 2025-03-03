@@ -2,8 +2,8 @@ import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBar } from '@angular/material/progress-bar';
-import { LoadingService } from '../commons/services/loading.service';
 import { Subscription } from 'rxjs';
+import { LoadingService } from '../core/services/loading.service';
 
 @Component({
   selector: 'app-layout',
