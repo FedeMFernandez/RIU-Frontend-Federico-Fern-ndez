@@ -1,19 +1,15 @@
 # Challenge
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.14 as a challenge for [RIU Hotel & Resorts](https://www.riu.com/es) @ [MinDATA](https://www.mindata.es/)
+Proyecto generado con [Angular CLI](https://github.com/angular/angular-cli) versión 18.2.14 como prueba técnica para [RIU Hotel & Resorts](https://www.riu.com/es) a través de [MinDATA](https://www.mindata.es/)
 
-## Development server
+## Tablero del proyecto
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Se puede solicitar acceso al tablero [RIU Front End Challenge en Trello](https://trello.com/b/Hw2yVhsj/riu-front-end-challenge) o enviando un correo a [fedefernandez218@gmail.com](mailto:fedefernandez218@gmail.com).
 
-## Project board
+## Estructura del proyecto
 
-You should request access to [RIU Front End Challenge @ Trello](https://trello.com/b/Hw2yVhsj/riu-front-end-challenge) or sending and email to
-[fedefernandez218@gmail.com](mailto:fedefernandez218@gmail.com).
+Basado en arquitectura limpia
 
-## Project scaffolding
-
-Clean architecture based
 ```
 /src
 │─ app
@@ -29,13 +25,14 @@ Clean architecture based
 
 ## Build
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/challenge` directory.
+Ejecta `ng build` para buildear el proyecto. El build será creado en la carpeta `dist/challenge`. Se debe utilizar algún http-server para poder levantarlo.
 
-## Running unit tests
+## Unit testing
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-You can see the code coverage created `coverage` directory.
+Ejecuta `ng test` para ejecutar tests vía [Karma](https://karma-runner.github.io).
+Puede ver su coverage en el navegador abriendo el archivo `index.html` dentro de la carpeta `coverage`.
 
 ## Docker
 
-You should install [Docker](https://docs.docker.com/get-started/get-docker/) and [docker-compose](https://docs.docker.com/compose/install) and follow the guide to deploy this app in a docker container.
+Se debe instalar [Docker](https://docs.docker.com/get-started/get-docker/) y [docker-compose](https://docs.docker.com/compose/install), y seguir las guías.
+Una vez hecho eso ejecuta `docker compose build` y luego `docker compose up -d`. El proyecto correrá en `http://localhost:8080`.

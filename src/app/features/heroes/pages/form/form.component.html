@@ -46,7 +46,7 @@
             <mat-label>Fecha de nacimiento</mat-label>
             <input formControlName="birth" matInput [matDatepicker]="picker">
             @if (birthControl.dirty && birthControl.invalid) {
-              <mat-hint>El formato debe ser {{ dateFormat }}</mat-hint>
+              <mat-hint>El formato debe ser {{ dateFormat }} y ser una fecha válida.</mat-hint>
             }
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>

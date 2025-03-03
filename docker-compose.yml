@@ -3,8 +3,7 @@ services:
     build:
       context: . #project root
       dockerfile: Dockerfile
-      tags:
-        - riu-challenge-front
-    container_name: riu-front
+    image: riu-front-image
+    container_name: riu-front-container
     ports:
-      - "80:80"
+      - "8080:80"
