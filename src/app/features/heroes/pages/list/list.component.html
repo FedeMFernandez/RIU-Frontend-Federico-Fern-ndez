@@ -5,9 +5,9 @@
     <div class="d-flex justify-content-between gap-3">
       <mat-form-field class="flex-grow-1">
           <mat-label>Buscar</mat-label>
-          <input matInput type="text" [(ngModel)]="searchInput" (ngModelChange)="searchChangeEventHandler($event)">
+          <input matInput type="text" [ngModel]="searchInput" (ngModelChange)="searchChangeEventHandler($event)">
           @if (searchInput.length) {
-            <button matSuffix mat-icon-button aria-label="Clear" (click)="searchInput=''">
+            <button matSuffix mat-icon-button aria-label="Clear" (click)="searchChangeEventHandler('');">
               <mat-icon>close</mat-icon>
             </button>
           }

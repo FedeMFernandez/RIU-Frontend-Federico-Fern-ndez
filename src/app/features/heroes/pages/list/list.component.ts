@@ -77,6 +77,7 @@ export class ListComponent implements OnInit {
 
   searchChangeEventHandler(filter: string): void {
     filter = filter.trim();
+    this.searchInput = filter;
     if (!filter.length) {
       this._dataSource = this.heroes;
       return;
