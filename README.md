@@ -6,7 +6,13 @@ This project was generated with [Angular CLI](https://github.com/angular/angular
 
 Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
+## Project board
+
+You should request access to [RIU Front End Challenge @ Trello](https://trello.com/b/Hw2yVhsj/riu-front-end-challenge) or sending and email to
+[fedefernandez218@gmail.com](mailto:fedefernandez218@gmail.com).
+
 ## Project scaffolding
+
 Clean architecture based
 ```
 /src
@@ -20,6 +26,7 @@ Clean architecture based
 │  │─ layout
 │─ environments
 ```
+
 ## Build
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/challenge` directory.
