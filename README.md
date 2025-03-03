@@ -4,7 +4,7 @@ Proyecto generado con [Angular CLI](https://github.com/angular/angular-cli) vers
 
 ## Tablero del proyecto
 
-Se puede solicitar acceso al tablero [RIU Front End Challenge en Trello](https://trello.com/b/Hw2yVhsj/riu-front-end-challenge) o enviando un correo a [fedefernandez218@gmail.com](mailto:fedefernandez218@gmail.com).
+Tablero [RIU Front End Challenge en Trello](https://trello.com/b/Hw2yVhsj/riu-front-end-challenge)
 
 ## Estructura del proyecto
 
@@ -35,4 +35,4 @@ Puede ver su coverage en el navegador abriendo el archivo `index.html` dentro de
 ## Docker
 
 Se debe instalar [Docker](https://docs.docker.com/get-started/get-docker/) y [docker-compose](https://docs.docker.com/compose/install), y seguir las guías.
-Una vez hecho eso ejecuta `docker compose build` y luego `docker compose up -d`. El proyecto correrá en `http://localhost:8080`.
+Una vez hecho eso ejecuta `docker compose up --build -d`. El proyecto correrá en `http://localhost:8080`.
