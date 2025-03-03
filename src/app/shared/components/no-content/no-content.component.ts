@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
@@ -6,7 +5,6 @@ import { MatIconModule } from '@angular/material/icon';
   selector: 'app-no-content-component',
   standalone: true,
   imports: [
-    CommonModule,
     MatIconModule,
   ],
   templateUrl: './no-content.component.html',

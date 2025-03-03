@@ -9,14 +9,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { TextUppercaseDirective } from 'src/app/commons/directives/text-uppercase.directive';
-import Patterns from 'src/app/commons/constants/patterns.constants';
-import { NotificationService } from 'src/app/commons/services/notification.service';
-import { LoadingService } from 'src/app/commons/services/loading.service';
-import { Subscription } from 'rxjs';
-import { Moment } from 'moment';
-import moment from 'moment';
-import { HeroService, HeroModelDTO } from 'src/app/commons/services/hero.service';
+import moment, { Moment } from 'moment';
+import { NotificationService } from 'src/app/core/services/notification.service';
+import { TextUppercaseDirective } from 'src/app/shared/directives/text-uppercase.directive';
+import { HeroService, HeroModelDTO } from '../../services/hero.service';
+import { MomentValidators } from 'src/app/shared/validators/moment.validator';
+import Patterns from 'src/app/core/constants/patterns.constants';
 
 @Component({
   selector: 'app-form',
@@ -45,10 +43,11 @@ export class FormComponent implements OnInit {
 
   loading: boolean = false;
   form!: FormGroup;
-  nameControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_WITH_SPACES_AND_DOTS)]);
+  dateFormat: string = 'DD/MM/YYYY';
+  nameControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_UPPERCASE_WITH_SPACES_AND_DOTS)]);
   powerControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_WITH_SPACES_AND_DOTS)]);
   weaknessControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_WITH_SPACES_AND_DOTS)]);
-  birthControl: FormControl = new FormControl(null, [Validators.required]);
+  birthControl: FormControl = new FormControl(null, [Validators.required, MomentValidators.validDate(this.dateFormat)]);
   isEdition: boolean = false;
 
   private heroID: number = 0;

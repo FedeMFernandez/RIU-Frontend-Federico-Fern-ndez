@@ -4,9 +4,9 @@ import { routes } from './app.routes';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { DateAdapter, MAT_DATE_FORMATS, MAT_DATE_LOCALE } from '@angular/material/core';
-import { LoadingInterceptor } from './commons/interceptors/loading.interceptor';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
-import Formats from './commons/constants/formats.constants';
+import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
+import Formats from './core/constants/formats.constants';
 
 export const appConfig: ApplicationConfig = {
   providers: [

@@ -20,7 +20,7 @@ describe('LoadingService', () => {
       subscription.unsubscribe();
       done();
     })
-    service.loading = true;
+    service.loading = true
   });
 
 });
