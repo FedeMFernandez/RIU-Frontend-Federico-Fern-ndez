@@ -3,7 +3,7 @@ services:
     build:
       context: . #project root
       dockerfile: Dockerfile
-    image: riu-frontend-image
-    container_name: riu-frontend-container
+    image: riu-front-image
+    container_name: riu-front-container
     ports:
       - "8080:80"
