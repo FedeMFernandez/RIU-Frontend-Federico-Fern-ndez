@@ -195,7 +195,8 @@ describe('ListComponent', () => {
       httpClientSpy.delete.and.returnValue(of());
       restServiceSpy.delete.and.returnValue(Promise.resolve());
       heroServiceSpy.delete.and.returnValue(Promise.resolve());
-      spyOn(Swal, 'fire').and.returnValue(Promise.resolve(<SweetAlertResult>{ isConfirmed: false }));
+      const spy = spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any)
+      spy.and.returnValue(Promise.resolve(<SweetAlertResult>{ isConfirmed: false }));
 
       await component.deleteEventHandler({ id: 1, name: 'FEDE' } as any);
 
