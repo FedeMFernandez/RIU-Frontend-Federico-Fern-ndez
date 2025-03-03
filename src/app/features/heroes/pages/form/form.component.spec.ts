@@ -57,20 +57,34 @@ describe('FormComponent', () => {
   });
 
   it('should create', () => {
+    const expected: HeroModelDTO = <HeroModelDTO>{
+      name: 'FEDE',
+      power: 'Programación',
+      weakness: 'Pentium 4',
+      birth: 682743600,
+      createdAt: 682743600,
+    };
+    httpClientSpy.get.and.returnValue(of(expected));
+    restServiceSpy.get.and.returnValue(Promise.resolve(expected));
+    heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
     fixture.detectChanges();
-    spyOn(Swal, 'fire').and.resolveTo(<SweetAlertResult>{
-      isDismissed: true,
-    })
+
     expect(component).toBeTruthy();
   });
 
   it('should show notification error while fetching heroe', async () => {
-    loadingService.loading = true;
-    const expected = new Error('Error al obtener héroe');
-    fixture.detectChanges();
-    heroServiceSpy.get.and.returnValue(Promise.reject(expected));
+    const error = new Error('Error obteniendo heroe');
+    httpClientSpy.get.and.returnValue(
+      throwError(() => error)
+    );
+    restServiceSpy.get.and.returnValue(Promise.reject(error));
+    heroServiceSpy.get.and.returnValue(Promise.reject(error));
+    spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
 
-    await expectAsync(heroServiceSpy.get()).toBeRejectedWith(expected);
+    loadingService.loading = true;
+    fixture.detectChanges();
+
+    await expectAsync(heroServiceSpy.get()).toBeRejectedWith(error);
   });
 
   describe('submitEventHandler()', () => {
@@ -94,6 +108,8 @@ describe('FormComponent', () => {
       httpClientSpy.post.and.returnValue(of(expected[0]));
       restServiceSpy.post.and.returnValue(Promise.resolve(expected[0]));
       heroServiceSpy.push.and.returnValue(Promise.resolve(expected[0]));
+      spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
+
       const location = TestBed.inject(Location);
 
       const formValue: any = {
@@ -133,6 +149,7 @@ describe('FormComponent', () => {
       );
       restServiceSpy.post.and.returnValue(Promise.reject(error));
       heroServiceSpy.push.and.returnValue(Promise.reject(error));
+      spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
 
       const formValue: any = {
         name: 'FEDE',
@@ -171,6 +188,7 @@ describe('FormComponent', () => {
       httpClientSpy.put.and.returnValue(of(expected[0]));
       restServiceSpy.put.and.returnValue(Promise.resolve(expected[0]));
       heroServiceSpy.update.and.returnValue(Promise.resolve(expected[0]));
+      spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
       const location = TestBed.inject(Location);
 
       const formValue: any = {
@@ -203,6 +221,7 @@ describe('FormComponent', () => {
       httpClientSpy.put.and.returnValue(throwError(() => error));
       restServiceSpy.put.and.returnValue(Promise.reject(error));
       heroServiceSpy.update.and.returnValue(Promise.reject(error));
+      spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
 
       const formValue: any = {
         name: 'FEDE',
@@ -240,7 +259,7 @@ describe('FormComponent', () => {
       expect(location.path()).toBe('/heroes');
     });
 
-    it('should not delete Hero while is not edition', async ()  => {
+    it('should not delete Hero if its not edition', async ()  => {
       activatedRouteSpy.snapshot.paramMap = new Map();
       fixture.detectChanges();
 
@@ -255,7 +274,6 @@ describe('FormComponent', () => {
       httpClientSpy.get.and.returnValue(of(expected));
       restServiceSpy.get.and.returnValue(Promise.resolve(expected));
       heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
-      spyOn(Swal, 'fire').and.returnValue(Promise.resolve(<SweetAlertResult>{ isConfirmed: true }));
 
       await component.deleteEventHandler();
       expect(heroServiceSpy.get).not.toHaveBeenCalled();
@@ -290,7 +308,6 @@ describe('FormComponent', () => {
       restServiceSpy.delete.and.returnValue(Promise.reject(error));
       heroServiceSpy.delete.and.returnValue(Promise.reject(error));
       spyOn(Swal, 'fire').and.returnValue(Promise.resolve(<SweetAlertResult>{ isConfirmed: true }));
-
       await component.deleteEventHandler();
 
       expect(Swal.fire).toHaveBeenCalled();

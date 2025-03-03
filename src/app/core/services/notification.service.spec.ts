@@ -14,7 +14,7 @@ describe('NotificationService', () => {
   });
 
   it('should show message', () => {
-    spyOn(Swal, 'fire').and.callThrough();
+    spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
     service.show('fake message');
     expect(Swal.fire).toHaveBeenCalled();
   });
