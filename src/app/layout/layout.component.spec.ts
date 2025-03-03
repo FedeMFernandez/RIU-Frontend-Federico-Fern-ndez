@@ -3,7 +3,6 @@ import { LayoutComponent } from './layout.component';
 import { provideRouter } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { LoadingService } from '../core/services/loading.service';
-import { of } from 'rxjs';
 
 describe('LayoutComponent', () => {
   let component: LayoutComponent;
