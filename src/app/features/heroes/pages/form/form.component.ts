@@ -99,6 +99,7 @@ export class FormComponent implements OnInit {
       this.form.setValue(this.fromHeroModelDTO(response));
     } catch (error: any) {
       this.notificationService.show('¡Ha ocurrido un error!', 'error');
+      this.router.navigate(['heroes']);
     } finally {
       this.loading = false;
     }
