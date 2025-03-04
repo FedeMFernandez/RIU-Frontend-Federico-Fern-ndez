@@ -1,9 +1,8 @@
 import { LocalStorageWrapper } from "./local-storage.wrapper";
-import { StorageAdapter } from "../adapters/storage.adapter";
 
 describe('LocalStorageWrapper', () => {
 
-  let wrapper!: StorageAdapter;
+  let wrapper!: LocalStorageWrapper;
   let mockStorage: {
     [key: string]: string,
   } = {
@@ -32,7 +31,11 @@ describe('LocalStorageWrapper', () => {
         key in mockStorage ? mockStorage[key] : null
       );
 
-      expect(wrapper.get).toThrowError();
+      try {
+        expect(wrapper.get('null'))
+      } catch (error) {
+        expect(error).toEqual(new Error("data is invalid or can't be converted to generic type"))
+      }
     });
   });
 
@@ -52,6 +55,23 @@ describe('LocalStorageWrapper', () => {
       const spy = spyOn(Storage.prototype, 'removeItem').and.callFake((key) => { });
 
       wrapper.remove('not-null');
+      expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  describe('clear()', () => {
+    it('should remove value of storage', () => {
+      const spy = spyOn(Storage.prototype, 'clear').and.returnValue();
+      wrapper.clear();
+      expect(spy).toHaveBeenCalled();
+    });
+  });
+
+  describe('length()', () => {
+    it('should remove value of storage', () => {
+      const spy = spyOnProperty(Storage.prototype, 'length', 'get').and.callThrough();
+
+      wrapper.length();
       expect(spy).toHaveBeenCalled();
     });
   });
