@@ -9,9 +9,8 @@ export class StorageAdapter {
     return this.successCallback(data);
   }
 
-  set<T>(key: string, value: string): T | Error {
-    this.storage.setItem(key, value);
-    return this.successCallback<T>(this.storage);
+  set(key: string, value: string): void {
+    return this.storage.setItem(key, value);
   }
 
   remove(key: string): void {
@@ -26,12 +25,12 @@ export class StorageAdapter {
     return this.storage.length;
   }
 
-  private successCallback<T>(data: any): T | Error {
+  private successCallback<T>(data: string | null): T | Error {
     try {
       if (!data) {
         throw new Error("data is invalid or can't be converted to generic type");
       }
-      return data as T;
+      return JSON.parse(data) as T;
     } catch (error: any) {
       throw error;
     }

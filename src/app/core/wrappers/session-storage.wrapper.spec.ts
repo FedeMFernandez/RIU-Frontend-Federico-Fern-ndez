@@ -23,7 +23,7 @@ describe('SessionStorageWrapper', () => {
         key in mockStorage ? mockStorage[key] : null
       );
 
-      expect(wrapper.get('not-null')).toBe('true');
+      expect(wrapper.get<boolean>('not-null')).toBe(true);
     });
 
     it('should return error', () => {

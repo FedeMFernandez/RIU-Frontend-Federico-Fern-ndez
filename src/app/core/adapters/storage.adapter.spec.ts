@@ -23,7 +23,7 @@ describe('StorageAdapter', () => {
         key in mockStorage ? mockStorage[key] : null
       );
 
-      expect(adapter.get('not-null')).toBe('true');
+      expect(adapter.get<boolean>('not-null')).toBe(true);
     });
 
     it('should return error', () => {
