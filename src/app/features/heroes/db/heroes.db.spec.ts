@@ -1,13 +1,14 @@
 import { LocalStorageWrapper } from "src/app/core/wrappers/local-storage.wrapper";
 import { HeroesDataBase, HeroModel } from "./heroes.db";
+import { StorageAdapter } from "src/app/core/adapters/storage.adapter";
 
 describe('HeroesDataBase', () => {
 
   let db: HeroesDataBase;
-  let localStorageWrapperSpy: jasmine.SpyObj<LocalStorageWrapper>;
+  let localStorageWrapperSpy: jasmine.SpyObj<StorageAdapter>;
 
   beforeEach(() => {
-    localStorageWrapperSpy = jasmine.createSpyObj('LocalStorageWrapper', ['get', 'set']);
+    localStorageWrapperSpy = jasmine.createSpyObj('StorageAdapter', ['get', 'set']);
   });
 
   it('should create', () => {
@@ -22,10 +23,6 @@ describe('HeroesDataBase', () => {
     }]);
     localStorageWrapperSpy.get.and.throwError(new Error());
     db = new HeroesDataBase(localStorageWrapperSpy);
-    expect(db).toBeTruthy();
-  });
-
-  it('should create', () => {
     expect(db).toBeTruthy();
   });
 
