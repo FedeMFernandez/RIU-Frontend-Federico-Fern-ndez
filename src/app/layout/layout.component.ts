@@ -1,9 +1,8 @@
-import { ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, computed, OnInit, Signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatProgressBar } from '@angular/material/progress-bar';
-import { Subscription } from 'rxjs';
-import { LoadingService } from '../core/services/loading.service';
+import { LoadingSignal } from '../core/signals/loading.signal';
 
 @Component({
   selector: 'app-layout',
@@ -16,28 +15,14 @@ import { LoadingService } from '../core/services/loading.service';
   templateUrl: './layout.component.html',
   styleUrl: './layout.component.scss'
 })
-export class LayoutComponent implements OnInit, OnDestroy {
+export class LayoutComponent implements OnInit {
 
-  loading: boolean = false;
-  private loadingSubscription!: Subscription;
+  loading: Signal<boolean> = computed(() => this.loadingSignal.loading());
 
   constructor(
-    private loadingService: LoadingService,
-    private changeDetectorRef: ChangeDetectorRef,
+    private loadingSignal: LoadingSignal,
   ) { }
 
-  ngOnInit(): void {
-    this.loadingSubscription = this.loadingService.loading.subscribe((value: boolean) => {
-      this.loading = value;
-    });
-  }
-
-  ngAfterViewChecked(): void {
-    this.changeDetectorRef.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    this.loadingSubscription.unsubscribe();
-  }
+  ngOnInit(): void {}
 
 }

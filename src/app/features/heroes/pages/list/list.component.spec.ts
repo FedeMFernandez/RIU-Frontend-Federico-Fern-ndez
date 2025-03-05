@@ -1,30 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { ListComponent } from './list.component';
+import { HeroesListPage } from './list.component';
 import { provideRouter, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import Swal, { SweetAlertResult } from 'sweetalert2';
-import { of, throwError } from 'rxjs';
+import { of } from 'rxjs';
 import { By } from '@angular/platform-browser';
-import { RestService } from 'src/app/core/services/rest.service';
+import { RestMock } from 'src/app/mocks/rest.mock';
 import { Location } from '@angular/common';
 import { HeroService, HeroModelDTO } from '../../services/hero.service';
 
-describe('ListComponent', () => {
-  let component: ListComponent;
-  let fixture: ComponentFixture<ListComponent>;
-  let httpClientSpy: jasmine.SpyObj<HttpClient>;
-  let restServiceSpy: jasmine.SpyObj<RestService>;
+describe('HeroesListPage', () => {
+  let component: HeroesListPage;
+  let fixture: ComponentFixture<HeroesListPage>;
+  let restMockSpy: jasmine.SpyObj<RestMock>;
   let heroServiceSpy: jasmine.SpyObj<HeroService>;
 
   beforeEach(async () => {
-    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'delete']);
-    restServiceSpy = jasmine.createSpyObj('RestService', ['get', 'delete']);
+    restMockSpy = jasmine.createSpyObj('RestMock', ['fakeQuery']);
     heroServiceSpy = jasmine.createSpyObj('HeroService', ['get', 'delete']);
 
     await TestBed.configureTestingModule({
       imports: [
-        ListComponent,
+        HeroesListPage,
         BrowserAnimationsModule,
       ],
       providers: [
@@ -32,13 +30,12 @@ describe('ListComponent', () => {
           { path: 'add', component: {} as any },
           { path: 'edit/:id', component: {} as any }
         ]),
-        { provide: HttpClient, useValue: httpClientSpy },
-        { provide: RestService, useValue: restServiceSpy },
+        { provide: RestMock, useValue: restMockSpy },
         { provide: HeroService, useValue: heroServiceSpy },
       ]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(ListComponent);
+    fixture = TestBed.createComponent(HeroesListPage);
     component = fixture.componentInstance;
   });
 
@@ -47,8 +44,7 @@ describe('ListComponent', () => {
   });
 
   it('should navigate to /add route', async () => {
-    httpClientSpy.get.and.returnValue(of([]));
-    restServiceSpy.get.and.returnValue(Promise.resolve([]));
+    restMockSpy.fakeQuery.and.returnValue(Promise.resolve([]));
     heroServiceSpy.get.and.returnValue(Promise.resolve([]));
 
     const router = TestBed.inject(Router);
@@ -69,8 +65,7 @@ describe('ListComponent', () => {
       birth: 682743600,
       createdAt: 682743600,
     }];
-    httpClientSpy.get.and.returnValue(of(expected));
-    restServiceSpy.get.and.returnValue(Promise.resolve(expected));
+    restMockSpy.fakeQuery.and.returnValue(Promise.resolve(expected));
     heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
 
     const router = TestBed.inject(Router);
@@ -91,8 +86,7 @@ describe('ListComponent', () => {
       birth: 682743600,
       createdAt: 682743600,
     }];
-    httpClientSpy.get.and.returnValue(of(expected));
-    restServiceSpy.get.and.returnValue(Promise.resolve(expected));
+    restMockSpy.fakeQuery.and.returnValue(Promise.resolve(expected));
     heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
 
     await component.ngOnInit();
@@ -114,8 +108,7 @@ describe('ListComponent', () => {
       birth: 682743600,
       createdAt: 682743600,
     }];
-    httpClientSpy.get.and.returnValue(of(expected));
-    restServiceSpy.get.and.returnValue(Promise.resolve(expected));
+    restMockSpy.fakeQuery.and.returnValue(Promise.resolve(expected));
     heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
 
     await component.ngOnInit();
@@ -130,8 +123,7 @@ describe('ListComponent', () => {
 
   describe('fetchList()', () => {
     it('should fetch empty list', ()  => {
-      httpClientSpy.get.and.returnValue(of([]));
-      restServiceSpy.get.and.returnValue(Promise.resolve([]));
+      restMockSpy.fakeQuery.and.returnValue(Promise.resolve([]));
       heroServiceSpy.get.and.returnValue(Promise.resolve([]));
 
       expect(component.heroes).toEqual([]);
@@ -146,8 +138,7 @@ describe('ListComponent', () => {
         birth: 682743600,
         createdAt: 682743600,
       }];
-      httpClientSpy.get.and.returnValue(of(expected));
-      restServiceSpy.get.and.returnValue(Promise.resolve(expected));
+      restMockSpy.fakeQuery.and.returnValue(Promise.resolve(expected));
       heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
 
       await component.ngOnInit();
@@ -156,11 +147,8 @@ describe('ListComponent', () => {
     });
 
     it('should throw response error', async ()  => {
-      const error = new Error('Error al obtener heroes')
-      httpClientSpy.get.and.returnValue(
-        throwError(() => error)
-      );
-      restServiceSpy.get.and.returnValue(Promise.reject(error));
+      restMockSpy.fakeQuery.and.returnValue(Promise.reject());
+      spyOn(console, 'error').and.callFake(() => {});
 
       await component.ngOnInit();
 
@@ -179,11 +167,9 @@ describe('ListComponent', () => {
         createdAt: 682743600,
       }];
 
-      httpClientSpy.delete.and.returnValue(of());
-      restServiceSpy.delete.and.returnValue(Promise.resolve());
+      restMockSpy.fakeQuery.and.returnValue(Promise.resolve());
       heroServiceSpy.delete.and.returnValue(Promise.resolve());
-      httpClientSpy.get.and.returnValue(of([]));
-      restServiceSpy.get.and.returnValue(Promise.resolve([]));
+      restMockSpy.fakeQuery.and.returnValue(Promise.resolve([]));
       spyOn(Swal, 'fire').and.returnValue(Promise.resolve(<SweetAlertResult>{ isConfirmed: true }));
 
       await component.deleteEventHandler({ id: 1, name: 'FEDE' } as any);
@@ -192,8 +178,7 @@ describe('ListComponent', () => {
     });
 
     it('should not delete Hero because of cancelation', async ()  => {
-      httpClientSpy.delete.and.returnValue(of());
-      restServiceSpy.delete.and.returnValue(Promise.resolve());
+      restMockSpy.fakeQuery.and.returnValue(Promise.resolve());
       heroServiceSpy.delete.and.returnValue(Promise.resolve());
       const spy = spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any)
       spy.and.returnValue(Promise.resolve(<SweetAlertResult>{ isConfirmed: false }));
@@ -204,12 +189,9 @@ describe('ListComponent', () => {
     });
 
     it('should not delete Hero because of error', async ()  => {
-      const error = new Error('Error al borrar héroe');
-
-      httpClientSpy.delete.and.returnValue(of());
-      restServiceSpy.delete.and.returnValue(Promise.reject(error));
-      heroServiceSpy.delete.and.returnValue(Promise.reject(error));
+      restMockSpy.fakeQuery.and.returnValue(Promise.reject());
       spyOn(Swal, 'fire').and.returnValue(Promise.resolve(<SweetAlertResult>{ isConfirmed: true }));
+      spyOn(console, 'error').and.callFake(() => {});
 
       await component.deleteEventHandler({ id: 1, name: 'FEDE' } as any);
 

@@ -1,18 +1,18 @@
 import { Routes } from '@angular/router';
-import { ListComponent } from './pages/list/list.component';
+import { HeroesListPage } from './pages/list/list.component';
 
 export const routes: Routes = [
   {
     path: '',
-    component: ListComponent,
+    component: HeroesListPage,
   },
   {
     path: 'add',
-    loadComponent: () => import('./pages/form/form.component').then(m => m.FormComponent),
+    loadComponent: () => import('./pages/form/form.component').then(m => m.HeroesFormPage),
   },
   {
     path: 'edit/:id',
-    loadComponent: () => import('./pages/form/form.component').then(m => m.FormComponent),
+    loadComponent: () => import('./pages/form/form.component').then(m => m.HeroesFormPage),
   },
   { path: '**', redirectTo: '' },
 ];

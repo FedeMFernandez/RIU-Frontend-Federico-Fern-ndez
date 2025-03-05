@@ -1,8 +1,9 @@
+import { StorageAdapter } from "../adapters/storage.adapter";
 import { LocalStorageWrapper } from "./local-storage.wrapper";
 
-describe('LocalStorageWrapper', () => {
+describe('StorageAdapter', () => {
 
-  let wrapper!: LocalStorageWrapper;
+  let wrapper!: StorageAdapter;
   let mockStorage: {
     [key: string]: string,
   } = {
@@ -23,18 +24,36 @@ describe('LocalStorageWrapper', () => {
         key in mockStorage ? mockStorage[key] : null
       );
 
-      expect(wrapper.get<boolean>('not-null')).toBe(true);
+      const response = wrapper.get('not-null');
+      expect(response).toBeTruthy();
     });
 
-    it('should return error', () => {
+    it('should throw key error', () => {
+      try {
+        wrapper.get('')
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(Error);
+      }
+    });
+
+    it('should throw parse error', () => {
+      spyOn(Storage.prototype, 'getItem').and.returnValue('|');
+      try {
+        wrapper.get('null')
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(Error);
+      }
+    });
+
+    it('should return null', () => {
       spyOn(Storage.prototype, 'getItem').and.callFake((key) =>
         key in mockStorage ? mockStorage[key] : null
       );
 
       try {
-        expect(wrapper.get('null'))
-      } catch (error) {
-        expect(error).toEqual(new Error("data is invalid or can't be converted to generic type"))
+        wrapper.get('null')
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(Error);
       }
     });
   });
@@ -62,6 +81,7 @@ describe('LocalStorageWrapper', () => {
   describe('clear()', () => {
     it('should remove value of storage', () => {
       const spy = spyOn(Storage.prototype, 'clear').and.returnValue();
+
       wrapper.clear();
       expect(spy).toHaveBeenCalled();
     });

@@ -4,9 +4,16 @@ export class StorageAdapter {
     private storage: Storage,
   ) { }
 
-  get<T>(key: string): T | null | Error {
-    const data = this.storage.getItem(key);
-    return this.successCallback<T>(data);
+  get(key: string): any | null {
+    try {
+      if (!key.trim().length) {
+        throw new Error('key must not be empty');
+      }
+      const data = this.storage.getItem(key);
+      return this.successCallback(data);
+    } catch(error: any) {
+      throw error;
+    }
   }
 
   set(key: string, value: any): void {
@@ -25,12 +32,12 @@ export class StorageAdapter {
     return this.storage.length;
   }
 
-  private successCallback<T>(data: string | null): T | null | Error {
+  private successCallback(data: string | null): any | null {
     try {
       if (!data) {
-        return data as T;
+        throw new Error('Error getting data from storage');
       }
-      return JSON.parse(data) as T;
+      return JSON.parse(data);
     } catch (error: any) {
       throw error;
     }

@@ -15,7 +15,7 @@ import { MomentFormatPipe } from 'src/app/shared/pipes/moment-format.pipe';
 import { HeroService, HeroModelDTO } from '../../services/hero.service';
 
 @Component({
-  selector: 'app-list',
+  selector: 'app-heroes-pages-list',
   standalone: true,
   imports: [
     RouterLink,
@@ -39,7 +39,7 @@ import { HeroService, HeroModelDTO } from '../../services/hero.service';
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
-export class ListComponent implements OnInit {
+export class HeroesListPage implements OnInit {
 
   @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
     this.dataSource.paginator = paginator;
@@ -92,7 +92,7 @@ export class ListComponent implements OnInit {
       this.heroes = response.map((hero: HeroModelDTO) => <Hero>{ ...hero });
       this._dataSource = this.heroes;
     } catch (error: any) {
-      console.log(error);
+      this.heroes = [];
     } finally {
       this.loading = false;
     }

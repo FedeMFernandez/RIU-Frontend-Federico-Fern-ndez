@@ -3,21 +3,22 @@ import { HttpHandlerFn, HttpInterceptorFn, HttpRequest, HttpResponse } from '@an
 import { fakeAsync, TestBed } from '@angular/core/testing';
 import { first, of } from 'rxjs';
 import { LoadingInterceptor } from './loading.interceptor';
-import { LoadingService } from '../services/loading.service';
+import { LoadingSignal } from '../signals/loading.signal';
+import { computed, Signal } from '@angular/core';
 
 describe('LoadingInterceptor', () => {
 
   const interceptor: HttpInterceptorFn = (req, next) => TestBed.runInInjectionContext(() => LoadingInterceptor(req, next));
-  let loadingService: LoadingService;
+  let loadingSignal: LoadingSignal;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
         provideHttpClientTesting(),
-        LoadingService,
       ],
-    })
-    loadingService = TestBed.inject(LoadingService);
+    });
+
+    loadingSignal = TestBed.inject(LoadingSignal);
   });
 
   it('should be created', () => {
@@ -30,16 +31,13 @@ describe('LoadingInterceptor', () => {
       return of(new HttpResponse<any>({ status: 200, statusText: 'OK' }));
     };
 
-    let loading: boolean = false;
-    loadingService.loading.subscribe(value => {
-      loading = value;
-    });
+    let loading: Signal<boolean> = computed(() => loadingSignal.loading());
 
     const observable = interceptor(httpRequest, handlerFn);
     const result = observable.pipe(first());
 
     result.subscribe(() => {
-      expect(loading).toBeTrue();
+      expect(loading()).toBeTrue();
     })
   }));
 });

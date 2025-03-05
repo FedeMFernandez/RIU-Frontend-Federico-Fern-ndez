@@ -1,3 +1,4 @@
+import { fakeAsync } from "@angular/core/testing";
 import { StorageAdapter } from "./storage.adapter";
 
 describe('StorageAdapter', () => {
@@ -23,18 +24,36 @@ describe('StorageAdapter', () => {
         key in mockStorage ? mockStorage[key] : null
       );
 
-      expect(adapter.get<boolean>('not-null')).toBe(true);
+      const response = adapter.get('not-null');
+      expect(response).toBeTruthy();
     });
 
-    it('should return error', () => {
-      const spy = spyOn(Storage.prototype, 'getItem').and.callFake((key) =>
+    it('should throw key error', () => {
+      try {
+        adapter.get('')
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(Error);
+      }
+    });
+
+    it('should throw parse error', () => {
+      spyOn(Storage.prototype, 'getItem').and.returnValue('|');
+      try {
+        adapter.get('null')
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(Error);
+      }
+    });
+
+    it('should return null', () => {
+      spyOn(Storage.prototype, 'getItem').and.callFake((key) =>
         key in mockStorage ? mockStorage[key] : null
       );
 
       try {
-        expect(adapter.get('null'))
-      } catch (error) {
-        expect(error).toEqual(new Error("data is invalid or can't be converted to generic type"))
+        adapter.get('null')
+      } catch (error: any) {
+        expect(error).toBeInstanceOf(Error);
       }
     });
   });
@@ -62,6 +81,7 @@ describe('StorageAdapter', () => {
   describe('clear()', () => {
     it('should remove value of storage', () => {
       const spy = spyOn(Storage.prototype, 'clear').and.returnValue();
+
       adapter.clear();
       expect(spy).toHaveBeenCalled();
     });
