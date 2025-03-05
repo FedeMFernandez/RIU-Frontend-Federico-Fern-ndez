@@ -1,58 +1,55 @@
+import { StorageAdapter } from './../../../../core/adapters/storage.adapter';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { FormComponent } from './form.component';
+import { HeroesFormPage } from './form.component';
 import { ActivatedRoute, provideRouter } from '@angular/router';
-import { HttpClient } from '@angular/common/http';
 import { MomentDateAdapter } from '@angular/material-moment-adapter';
 import { DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS } from '@angular/material/core';
 import { provideNoopAnimations } from '@angular/platform-browser/animations';
 import moment from 'moment';
-import { of, throwError } from 'rxjs';
-import { LoadingService } from 'src/app/core/services/loading.service';
-import { RestService } from 'src/app/core/services/rest.service';
-import Swal, { SweetAlertResult } from 'sweetalert2';
 import { HeroService, HeroModelDTO } from '../../services/hero.service';
 import { Location } from '@angular/common';
 import Formats from 'src/app/core/constants/formats.constants';
+import { RestMock } from 'src/app/mocks/rest.mock';
+import { HeroesErrors } from '../../constants/errors.constants';
+import Swal, { SweetAlertResult } from 'sweetalert2';
+import { LocalStorageWrapper } from 'src/app/core/wrappers/local-storage.wrapper';
 
 describe('FormComponent', () => {
-  let component: FormComponent;
-  let fixture: ComponentFixture<FormComponent>;
-  let httpClientSpy: jasmine.SpyObj<HttpClient>;
-  let restServiceSpy: jasmine.SpyObj<RestService>;
+  let component: HeroesFormPage;
+  let fixture: ComponentFixture<HeroesFormPage>;
+  let restMockSpy: jasmine.SpyObj<RestMock>;
   let heroServiceSpy: jasmine.SpyObj<HeroService>;
-  let activatedRouteSpy: any;
-  let loadingService: LoadingService;
+  let storageAdapter: jasmine.SpyObj<StorageAdapter>;
+  let activatedRouteMock: any;
 
   beforeEach(async () => {
-    httpClientSpy = jasmine.createSpyObj('HttpClient', ['get', 'post', 'put', 'delete']);
-    restServiceSpy = jasmine.createSpyObj('RestService', ['get', 'post', 'put', 'delete']);
+    restMockSpy = jasmine.createSpyObj('RestMock', ['fakeQuery']);
+    storageAdapter = jasmine.createSpyObj('StorageAdapter', ['get', 'set', 'remove']);
     heroServiceSpy = jasmine.createSpyObj('HeroService', ['get', 'push', 'update', 'delete']);
-    activatedRouteSpy = {
+    activatedRouteMock = {
       snapshot: {
         paramMap: new Map([['id', '1']]),
       }
     };
-    loadingService = new LoadingService();
 
     await TestBed.configureTestingModule({
-      imports: [FormComponent],
+      imports: [HeroesFormPage],
       providers: [
         provideRouter([{
           path: 'heroes', component: {} as any,
         }]),
         provideNoopAnimations(),
-        { provide: ActivatedRoute, useValue: activatedRouteSpy },
-        { provide: HttpClient, useValue: httpClientSpy },
-        { provide: RestService, useValue: restServiceSpy },
+        { provide: ActivatedRoute, useValue: activatedRouteMock },
+        { provide: RestMock, useValue: restMockSpy },
         { provide: HeroService, useValue: heroServiceSpy },
-        { provide: LoadingService, useValue: loadingService },
         { provide: DateAdapter, useClass: MomentDateAdapter, deps: [MAT_DATE_LOCALE] },
+        { provide: LocalStorageWrapper, useValue: storageAdapter },
         { provide: MAT_DATE_FORMATS, useValue: Formats.MOMENT_DATE_FORMAT }
       ]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(FormComponent);
+    fixture = TestBed.createComponent(HeroesFormPage);
     component = fixture.componentInstance;
   });
 
@@ -64,39 +61,24 @@ describe('FormComponent', () => {
       birth: 682743600,
       createdAt: 682743600,
     };
-    httpClientSpy.get.and.returnValue(of(expected));
-    restServiceSpy.get.and.returnValue(Promise.resolve(expected));
     heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
-    fixture.detectChanges();
 
     expect(component).toBeTruthy();
   });
 
   it('should show notification error while fetching heroe', async () => {
-    const error = new Error('Error obteniendo heroe');
-    httpClientSpy.get.and.returnValue(
-      throwError(() => error)
-    );
-    restServiceSpy.get.and.returnValue(Promise.reject(error));
+    const error = HeroesErrors.HERO_NOT_FOUND(1);
     heroServiceSpy.get.and.returnValue(Promise.reject(error));
     spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
-
-    loadingService.loading = true;
-    fixture.detectChanges();
 
     await expectAsync(heroServiceSpy.get()).toBeRejectedWith(error);
   });
 
   describe('submitEventHandler()', () => {
     it('should add hero', async () => {
-      activatedRouteSpy.snapshot.paramMap = new Map();
-      fixture.detectChanges();
+      activatedRouteMock.snapshot.paramMap = new Map();
 
       const expected: HeroModelDTO[] = [];
-      httpClientSpy.get.and.returnValue(of(expected));
-      restServiceSpy.get.and.returnValue(Promise.resolve(expected));
-      heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
-
       expected.push({
         id: 1,
         name: 'FEDE',
@@ -105,8 +87,6 @@ describe('FormComponent', () => {
         birth: 682743600,
         createdAt: 682743600,
       });
-      httpClientSpy.post.and.returnValue(of(expected[0]));
-      restServiceSpy.post.and.returnValue(Promise.resolve(expected[0]));
       heroServiceSpy.push.and.returnValue(Promise.resolve(expected[0]));
       spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
 
@@ -125,30 +105,7 @@ describe('FormComponent', () => {
     });
 
     it('should not add hero', async () => {
-      activatedRouteSpy.snapshot.paramMap = new Map();
-      fixture.detectChanges();
-
-      const expected: HeroModelDTO[] = [];
-      httpClientSpy.get.and.returnValue(of(expected));
-      restServiceSpy.get.and.returnValue(Promise.resolve(expected));
-      heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
-
-      expected.push({
-        id: 1,
-        name: 'FEDE',
-        power: 'Programación',
-        weakness: 'Pentium 4',
-        birth: 682743600,
-        createdAt: 682743600,
-      });
-
-      const error = new Error('No se pudo completar');
-
-      httpClientSpy.post.and.returnValue(
-        throwError(() => new Error('No se pudo completar'))
-      );
-      restServiceSpy.post.and.returnValue(Promise.reject(error));
-      heroServiceSpy.push.and.returnValue(Promise.reject(error));
+      restMockSpy.fakeQuery.and.throwError(new Error());
       spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
 
       const formValue: any = {
@@ -158,14 +115,11 @@ describe('FormComponent', () => {
         birth: moment.unix(682743600),
       };
       await component.submitEventHandler(formValue);
-
-      expect(heroServiceSpy.update).not.toHaveBeenCalled();
+      expect(restMockSpy.fakeQuery).toHaveBeenCalled();
     });
 
      it('should update hero', async () => {
-      fixture.detectChanges();
-
-      let expected: HeroModelDTO[] = [{
+      const expected: HeroModelDTO[] = [{
         id: 1,
         name: 'FEDE',
         power: 'Programación',
@@ -173,20 +127,10 @@ describe('FormComponent', () => {
         birth: 682743600,
         createdAt: 682743600,
       }];
-      httpClientSpy.get.and.returnValue(of(expected));
-      restServiceSpy.get.and.returnValue(Promise.resolve(expected));
-      heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
+      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
+      storageAdapter.get.and.returnValue(expected);
+      fixture.detectChanges();
 
-      expected = [{
-        id: 1,
-        name: 'FEDE',
-        power: 'Programación',
-        weakness: 'Dual core',
-        birth: 682743600,
-        createdAt: 682743600,
-      }];
-      httpClientSpy.put.and.returnValue(of(expected[0]));
-      restServiceSpy.put.and.returnValue(Promise.resolve(expected[0]));
       heroServiceSpy.update.and.returnValue(Promise.resolve(expected[0]));
       spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
       const location = TestBed.inject(Location);
@@ -197,15 +141,13 @@ describe('FormComponent', () => {
         weakness: 'Dual core',
         birth: moment.unix(682743600),
       };
-      await component.submitEventHandler(formValue);
 
+      await component.submitEventHandler(formValue);
       expect(location.path()).toBe('/heroes');
     });
 
     it('should not update hero', async () => {
-      fixture.detectChanges();
-
-      let expected: HeroModelDTO[] = [{
+      const expected: HeroModelDTO[] = [{
         id: 1,
         name: 'FEDE',
         power: 'Programación',
@@ -213,25 +155,23 @@ describe('FormComponent', () => {
         birth: 682743600,
         createdAt: 682743600,
       }];
-      httpClientSpy.get.and.returnValue(of(expected));
-      restServiceSpy.get.and.returnValue(Promise.resolve(expected));
-      heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
+      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
+      storageAdapter.get.and.returnValue(expected);
+      fixture.detectChanges();
 
-      const error = new Error('No se pudo completar')
-      httpClientSpy.put.and.returnValue(throwError(() => error));
-      restServiceSpy.put.and.returnValue(Promise.reject(error));
-      heroServiceSpy.update.and.returnValue(Promise.reject(error));
-      spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
-
+      const error = HeroesErrors.HERO_NOT_FOUND(1);
+      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
+      storageAdapter.get.and.throwError(error);
+      restMockSpy.fakeQuery.and.throwError(error);
       const formValue: any = {
         name: 'FEDE',
         power: 'Programación',
         weakness: 'Dual core',
         birth: moment.unix(682743600),
       };
+      spyOn(Swal, 'fire').and.returnValue(Promise.resolve() as any);
       await component.submitEventHandler(formValue);
-
-      await expectAsync(heroServiceSpy.update(1, formValue)).toBeRejectedWith(error);
+      expect(restMockSpy.fakeQuery).toHaveBeenCalled();
     });
   });
 
@@ -247,12 +187,7 @@ describe('FormComponent', () => {
         createdAt: 682743600,
       };
       const location = TestBed.inject(Location);
-      httpClientSpy.get.and.returnValue(of(expected));
-      restServiceSpy.get.and.returnValue(Promise.resolve(expected));
-      heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
-
       heroServiceSpy.delete.and.returnValue(Promise.resolve());
-
       spyOn(Swal, 'fire').and.returnValue(Promise.resolve(<SweetAlertResult>{ isConfirmed: true }));
 
       await component.deleteEventHandler();
@@ -260,7 +195,7 @@ describe('FormComponent', () => {
     });
 
     it('should not delete Hero if its not edition', async ()  => {
-      activatedRouteSpy.snapshot.paramMap = new Map();
+      activatedRouteMock.snapshot.paramMap = new Map();
       fixture.detectChanges();
 
       const expected: HeroModelDTO = {
@@ -271,8 +206,6 @@ describe('FormComponent', () => {
         birth: 682743600,
         createdAt: 682743600,
       };
-      httpClientSpy.get.and.returnValue(of(expected));
-      restServiceSpy.get.and.returnValue(Promise.resolve(expected));
       heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
 
       await component.deleteEventHandler();
@@ -280,37 +213,34 @@ describe('FormComponent', () => {
     });
 
     it('should not delete Hero because of cancelation', async ()  => {
-      fixture.detectChanges();
       spyOn(Swal, 'fire').and.returnValue(Promise.resolve(<SweetAlertResult>{ isConfirmed: false }));
+      fixture.detectChanges();
 
       await component.deleteEventHandler();
-
       expect(Swal.fire).toHaveBeenCalled();
     });
 
     it('should not delete Hero because of error', async ()  => {
-      fixture.detectChanges();
-      const expected: HeroModelDTO = {
+      const expected: HeroModelDTO[] = [{
         id: 1,
         name: 'FEDE',
         power: 'Programación',
         weakness: 'Pentium 4',
         birth: 682743600,
         createdAt: 682743600,
-      };
-      httpClientSpy.get.and.returnValue(of(expected));
-      restServiceSpy.get.and.returnValue(Promise.resolve(expected));
-      heroServiceSpy.get.and.returnValue(Promise.resolve(expected));
+      }];
+      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
+      storageAdapter.get.and.returnValue(expected);
+      fixture.detectChanges();
 
-      const error = new Error('Error al borrar héroe');
-
-      httpClientSpy.delete.and.returnValue(of());
-      restServiceSpy.delete.and.returnValue(Promise.reject(error));
-      heroServiceSpy.delete.and.returnValue(Promise.reject(error));
       spyOn(Swal, 'fire').and.returnValue(Promise.resolve(<SweetAlertResult>{ isConfirmed: true }));
-      await component.deleteEventHandler();
+      const error = HeroesErrors.HERO_NOT_FOUND(1);
+      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
+      storageAdapter.get.and.throwError(error);
+      restMockSpy.fakeQuery.and.throwError(error);
 
-      expect(Swal.fire).toHaveBeenCalled();
+      await component.deleteEventHandler();
+      expect(restMockSpy.fakeQuery).toHaveBeenCalled();
     });
   });
 

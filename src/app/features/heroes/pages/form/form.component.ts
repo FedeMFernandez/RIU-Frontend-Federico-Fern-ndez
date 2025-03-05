@@ -17,7 +17,7 @@ import { MomentValidators } from 'src/app/shared/validators/moment.validator';
 import Patterns from 'src/app/core/constants/patterns.constants';
 
 @Component({
-  selector: 'app-form',
+  selector: 'app-heroes-pages-form',
   standalone: true,
   imports: [
     RouterModule,
@@ -39,7 +39,7 @@ import Patterns from 'src/app/core/constants/patterns.constants';
   templateUrl: './form.component.html',
   styleUrl: './form.component.scss'
 })
-export class FormComponent implements OnInit {
+export class HeroesFormPage implements OnInit {
 
   loading: boolean = false;
   form!: FormGroup;
@@ -98,7 +98,7 @@ export class FormComponent implements OnInit {
       const response = await this.heroService.get(id) as HeroModelDTO;
       this.form.setValue(this.fromHeroModelDTO(response));
     } catch (error: any) {
-      this.notificationService.show('¡Ha ocurrido un error!', 'error');
+      this.notificationService.show(error.message, 'error');
       this.router.navigate(['heroes']);
     } finally {
       this.loading = false;
@@ -112,7 +112,7 @@ export class FormComponent implements OnInit {
       this.notificationService.show(`Se ha guardado el héroe ${values.name}`);
       this.router.navigate(['heroes']);
     } catch (error: any) {
-      this.notificationService.show('¡Ha ocurrido un error!', 'error');
+      this.notificationService.show(error.message, 'error');
     } finally {
       this.loading = false;
     }
@@ -125,7 +125,7 @@ export class FormComponent implements OnInit {
       this.notificationService.show(`Se ha actualizado el héroe ${values.name}`);
       this.router.navigate(['heroes']);
     } catch (error: any) {
-      this.notificationService.show('¡Ha ocurrido un error!', 'error');
+      this.notificationService.show(error.message, 'error');
     } finally {
       this.loading = false;
     }
@@ -138,7 +138,7 @@ export class FormComponent implements OnInit {
       this.router.navigate(['heroes']);
       this.notificationService.show(`Se ha borrado el héroe ${values.name}`);
     } catch (error: any) {
-      this.notificationService.show('¡Ha ocurrido un error!', 'error');
+      this.notificationService.show(error.message, 'error');
     } finally {
       this.loading = false;
     }
