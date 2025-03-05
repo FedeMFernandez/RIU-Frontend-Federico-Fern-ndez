@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, Input } from '@angular/core';
+import { Component, ViewChild, Signal, computed, effect } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +12,8 @@ import { MatSortModule, MatSort } from '@angular/material/sort';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { NoContentComponent } from 'src/app/shared/components/no-content/no-content.component';
 import { MomentFormatPipe } from 'src/app/shared/pipes/moment-format.pipe';
-import { HeroService, HeroModelDTO } from '../../services/hero.service';
+import { HeroService } from '../../services/hero.service';
+import { HeroesDataBase, HeroModel } from '../../db/heroes.db';
 
 @Component({
   selector: 'app-heroes-pages-list',
@@ -39,7 +40,7 @@ import { HeroService, HeroModelDTO } from '../../services/hero.service';
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss'
 })
-export class HeroesListPage implements OnInit {
+export class HeroesListPage {
 
   @ViewChild(MatPaginator) set paginator(paginator: MatPaginator) {
     this.dataSource.paginator = paginator;
@@ -49,26 +50,27 @@ export class HeroesListPage implements OnInit {
     this.dataSource.sort = sort;
   }
 
-  @Input() private set _dataSource(value: Hero[]) {
-    this.dataSource.data = value;
-  }
-
-  loading: boolean = false;
   displayedColumns: string[] = ['id', 'name', 'power', 'weakness', 'birth', 'createdAt', 'actions'];
   searchInput: string = '';
-  dataSource: MatTableDataSource<Hero> = new MatTableDataSource<Hero>([]);
-  heroes: Hero[] = [];
+  dataSource: MatTableDataSource<HeroModel> = new MatTableDataSource<HeroModel>([]);
+
+  private readonly heroes: Signal<HeroModel[]> = computed(() => this.heroesDataBase.heroesCollection());
 
   constructor(
     private heroService: HeroService,
+    private heroesDataBase: HeroesDataBase,
     private notificationService: NotificationService,
-  ) { }
-
-  async ngOnInit(): Promise<void> {
-    await this.fetchList();
+  ) {
+    this.init();
   }
 
-  async deleteEventHandler(hero: Hero): Promise<void> {
+  init() {
+    effect(() => {
+      this.dataSource.data = this.heroes();
+    });
+  }
+
+  async deleteEventHandler(hero: HeroModel): Promise<void> {
     const confirm = await this.notificationService.showQuestion(`¿Desea borrar al héroe ${hero.name}?`);
     if (confirm) {
       await this.delete(hero);
@@ -79,42 +81,19 @@ export class HeroesListPage implements OnInit {
     filter = filter.trim();
     this.searchInput = filter;
     if (!filter.length) {
-      this._dataSource = this.heroes;
+      this.dataSource.data = this.heroes();
       return;
     }
-    this._dataSource = this.heroes.filter((element: Hero) => (element.name.toLowerCase().includes(filter.toLowerCase()) || element.id.toString() === filter));
+    this.dataSource.data = this.heroes().filter((element: HeroModel) => (element.name.toLowerCase().includes(filter.toLowerCase()) || element.id.toString() === filter));
   }
 
-  private async fetchList(): Promise<void> {
-    try {
-      this.loading = true;
-      const response = await this.heroService.get() as HeroModelDTO[];
-      this.heroes = response.map((hero: HeroModelDTO) => <Hero>{ ...hero });
-      this._dataSource = this.heroes;
-    } catch (error: any) {
-      this.heroes = [];
-    } finally {
-      this.loading = false;
-    }
-  }
-
-  private async delete(hero: Hero): Promise<void> {
+  private async delete(hero: HeroModel): Promise<void> {
     try {
       await this.heroService.delete(hero.id);
       this.notificationService.show(`Se ha borrado el héroe ${hero.name}`);
-      await this.fetchList();
     } catch (error: any) {
       this.notificationService.show('¡Ha ocurrido un error!', 'error');
     }
   }
 
-}
-
-interface Hero {
-  id: number;
-  name: string;
-  power: string;
-  weakness: string;
-  birth: number;
-  createdAt: number;
 }

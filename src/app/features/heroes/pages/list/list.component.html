@@ -21,11 +21,7 @@
   <article>
   <mat-card>
     <mat-card-content>
-        @if (loading) {
-          <div class="d-flex justify-content-center align-items-center">
-            <mat-spinner />
-          </div>
-        } @else if (!dataSource.data.length) {
+        @if (!dataSource.data.length) {
           <div class="d-flex justify-content-center align-items-center">
              <app-no-content-component />
           </div>

@@ -1,20 +1,19 @@
-import { HeroesErrors } from './../constants/errors.constants';
 import { RestMock } from "src/app/mocks/rest.mock";
-import { HeroModelDTO, HeroService } from "./hero.service";
-import { LocalStorageWrapper } from "src/app/core/wrappers/local-storage.wrapper";
-import { fakeAsync } from "@angular/core/testing";
+import { HeroService } from './hero.service';
+import { HeroesDataBase, HeroModel } from '../db/heroes.db';
+import { HeroesErrors } from "../constants/errors.constants";
 
 describe('HeroService', () => {
 
   let service: HeroService;
   let restMockSpy: jasmine.SpyObj<RestMock>;
-  let localStorageWrapperSpy: jasmine.SpyObj<LocalStorageWrapper>;
+  let heroDataBase: jasmine.SpyObj<HeroesDataBase>;
 
   beforeEach(() => {
     restMockSpy = jasmine.createSpyObj('RestMock', ['fakeQuery']);
-    localStorageWrapperSpy = jasmine.createSpyObj('LocalStorageWrapper', ['get', 'set', 'remove']);
-    localStorageWrapperSpy.get.and.throwError(new Error());
-    service = new HeroService(restMockSpy, localStorageWrapperSpy);
+    heroDataBase = jasmine.createSpyObj('HeroesDataBase', ['get', 'push', 'update', 'delete']);
+    heroDataBase.get.and.throwError(new Error());
+    service = new HeroService(restMockSpy, heroDataBase);
   });
 
   it('should create', () => {
@@ -22,78 +21,49 @@ describe('HeroService', () => {
   });
 
   describe('get()', () => {
-    it('should resolve getting all', (done: DoneFn) => {
-      localStorageWrapperSpy.get.and.returnValue([]);
-      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
-
-      service.get().then((response: any) => {
-        expect(response).toBeTruthy();
-        done();
-      });
+    it('should resolve getting all', () => {
+      heroDataBase.get.and.returnValue([]);
+      expect(service.get()).toBeTruthy();
     });
 
-    it('should resolve getting one', (done: DoneFn) => {
-      localStorageWrapperSpy.get.and.returnValue([{
-        id: 1,
-      }]);
-      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
-
-      service.get(1).then((response: any) => {
-        expect(response).toBeTruthy();
-        done();
-      });
-    });
-
-    it('should throw error hero not found', async () => {
-      localStorageWrapperSpy.get.and.returnValue([{
+    it('should throw error hero not found', () => {
+      heroDataBase.get.and.returnValue([{
         id: 2,
-      }]);
-      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
-      await expectAsync(service.get(1)).toBeRejected();
-    });
-
-    it('should reject', async () => {
-      const expectedError = HeroesErrors.HERO_NOT_FOUND;
-      localStorageWrapperSpy.get.and.returnValue([]);
-      restMockSpy.fakeQuery.and.throwError(expectedError(1));
-      await expectAsync(service.get(1)).toBeRejected();
+      } as any]);
+      expect(service.get).toThrowError();
     });
   });
 
   describe('push()', () => {
-    it('should resolve', (done: DoneFn) => {
-      localStorageWrapperSpy.get.and.returnValue([{
+    it('should resolve', () => {
+      heroDataBase.get.and.returnValue([{
         id: 1,
-      }]);
-      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
+      } as any]);
+      heroDataBase.push.and.returnValue({
+        id: 1,
+      } as any);
 
-      service.push(<HeroModelDTO>{}).then((response: any) => {
-        expect(response).toBeTruthy();
-        done();
-      });
+      expect(service.push(<HeroModel>{})).toBeTruthy();
     });
 
-    it('should reject', (done: DoneFn) => {
-      const expectedError = new Error('Other Error');
-      localStorageWrapperSpy.get.and.returnValue([]);
-      restMockSpy.fakeQuery.and.throwError(expectedError);
-
-      service.push(<any>{}).catch((error: any) => {
-        expect(error).toBeTruthy();
-        done();
-      });
+    it('should reject', () => {
+      heroDataBase.get.and.returnValue([]);
+      heroDataBase.push.and.throwError(new Error());
+      expect(service.push).toThrowError();
     });
   });
 
   describe('update()', () => {
     it('should resolve', (done: DoneFn) => {
-      localStorageWrapperSpy.get.and.returnValue([{
+      heroDataBase.get.and.returnValue([{
         id: 1,
-      }]);
-      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
+      } as any]);
+      heroDataBase.update.and.returnValue({
+        id: 1,
+      } as any);
       restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
 
-      service.update(1, <HeroModelDTO>{}).then((response: any) => {
+      service.update(1, <HeroModel>{}).then((response: any) => {
         expect(response).toBeTruthy();
         done();
       });
@@ -101,9 +71,9 @@ describe('HeroService', () => {
 
     it('should reject', (done: DoneFn) => {
       const expectedError = new Error('Other Error');
-      localStorageWrapperSpy.get.and.returnValue([{
+      heroDataBase.get.and.returnValue([{
         id: 1,
-      }]);
+      } as any]);
       restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
       restMockSpy.fakeQuery.and.throwError(expectedError);
 
@@ -116,25 +86,22 @@ describe('HeroService', () => {
 
   describe('delete()', () => {
     it('should resolve', (done: DoneFn) => {
-      const expectedError = HeroesErrors.HERO_NOT_FOUND;
-      localStorageWrapperSpy.get.and.returnValue([{
+      heroDataBase.get.and.returnValue([{
         id: 1,
-      }]);
-      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
+      } as any]);
       restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
 
       service.delete(1).then((response: any) => {
-        expect(restMockSpy.fakeQuery).toHaveBeenCalled();
+        expect(response).toBeUndefined();
         done();
       });
     });
 
     it('should reject', (done: DoneFn) => {
       const expectedError = new Error('Other Error');
-      localStorageWrapperSpy.get.and.returnValue([{
+      heroDataBase.get.and.returnValue([{
         id: 1,
-      }]);
-      restMockSpy.fakeQuery.and.callFake((callback: Function) => callback());
+      } as any]);
       restMockSpy.fakeQuery.and.throwError(expectedError);
 
       service.delete(1).catch((error: any) => {

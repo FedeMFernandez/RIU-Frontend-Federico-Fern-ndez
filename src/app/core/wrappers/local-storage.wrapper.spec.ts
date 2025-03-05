@@ -1,9 +1,8 @@
-import { StorageAdapter } from "../adapters/storage.adapter";
 import { LocalStorageWrapper } from "./local-storage.wrapper";
 
-describe('StorageAdapter', () => {
+describe('LocalStorageWrapper', () => {
 
-  let wrapper!: StorageAdapter;
+  let wrapper!: LocalStorageWrapper;
   let mockStorage: {
     [key: string]: string,
   } = {

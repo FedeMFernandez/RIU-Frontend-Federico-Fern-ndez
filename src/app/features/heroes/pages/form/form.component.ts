@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { LoadingSignal } from './../../../../core/signals/loading.signal';
+import { Component, computed, OnInit, Signal } from '@angular/core';
 import { MatSelectModule } from '@angular/material/select';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,9 +13,10 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import moment, { Moment } from 'moment';
 import { NotificationService } from 'src/app/core/services/notification.service';
 import { TextUppercaseDirective } from 'src/app/shared/directives/text-uppercase.directive';
-import { HeroService, HeroModelDTO } from '../../services/hero.service';
+import { HeroService } from '../../services/hero.service';
 import { MomentValidators } from 'src/app/shared/validators/moment.validator';
 import Patterns from 'src/app/core/constants/patterns.constants';
+import { HeroModel } from '../../db/heroes.db';
 
 @Component({
   selector: 'app-heroes-pages-form',
@@ -41,12 +43,12 @@ import Patterns from 'src/app/core/constants/patterns.constants';
 })
 export class HeroesFormPage implements OnInit {
 
-  loading: boolean = false;
+  loading: Signal<boolean> = computed(() => this.loadingSignal.loading());
   form!: FormGroup;
   dateFormat: string = 'DD/MM/YYYY';
-  nameControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_UPPERCASE_WITH_SPACES_AND_DOTS)]);
-  powerControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_WITH_SPACES_AND_DOTS)]);
-  weaknessControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_WITH_SPACES_AND_DOTS)]);
+  nameControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_UPPERCASE_WITH_SPACES_DOTS_DASH)]);
+  powerControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_WITH_SPACES_DOTS_DASH)]);
+  weaknessControl: FormControl = new FormControl('', [Validators.required, Validators.pattern(Patterns.TEXT_WITH_SPACES_DOTS_DASH)]);
   birthControl: FormControl = new FormControl(null, [Validators.required, MomentValidators.validDate(this.dateFormat)]);
   isEdition: boolean = false;
 
@@ -57,6 +59,7 @@ export class HeroesFormPage implements OnInit {
     private activatedRoute: ActivatedRoute,
     private heroService: HeroService,
     private notificationService: NotificationService,
+    private loadingSignal: LoadingSignal,
   ) { }
 
   async ngOnInit(): Promise<void> {
@@ -71,16 +74,15 @@ export class HeroesFormPage implements OnInit {
     if (idParam) {
       this.heroID = parseInt(idParam);
       this.isEdition = true;
-      await this.fetch(this.heroID);
+      this.fetch(this.heroID);
     }
   }
 
   async submitEventHandler(values: Form): Promise<void> {
-    if (this.isEdition) {
-      await this.update(values);
-      return;
-    }
-    await this.add(values);
+      if (this.isEdition) {
+        return await this.update(values);
+      }
+      this.add(values);
   }
 
   async deleteEventHandler(): Promise<void> {
@@ -92,59 +94,47 @@ export class HeroesFormPage implements OnInit {
     }
   }
 
-  private async fetch(id: number): Promise<void> {
+  private fetch(id: number): void {
     try {
-      this.loading = true;
-      const response = await this.heroService.get(id) as HeroModelDTO;
-      this.form.setValue(this.fromHeroModelDTO(response));
+      const response = this.heroService.get(id) as HeroModel;
+      this.form.setValue(this.fromHeroModel(response));
     } catch (error: any) {
       this.notificationService.show(error.message, 'error');
       this.router.navigate(['heroes']);
-    } finally {
-      this.loading = false;
     }
   }
 
-  private async add(values: Form): Promise<void> {
+  private add(values: Form): void {
     try {
-      this.loading = true;
-      await this.heroService.push(this.toHeroModelDTO(values));
+      this.heroService.push(this.toHeroModel(values));
       this.notificationService.show(`Se ha guardado el héroe ${values.name}`);
       this.router.navigate(['heroes']);
     } catch (error: any) {
       this.notificationService.show(error.message, 'error');
-    } finally {
-      this.loading = false;
     }
   }
 
   private async update(values: Form): Promise<void> {
     try {
-      this.loading = true;
-      await this.heroService.update(this.heroID, this.toHeroModelDTO(values));
+      await this.heroService.update(this.heroID, this.toHeroModel(values));
       this.notificationService.show(`Se ha actualizado el héroe ${values.name}`);
       this.router.navigate(['heroes']);
     } catch (error: any) {
       this.notificationService.show(error.message, 'error');
-    } finally {
-      this.loading = false;
     }
   }
 
   private async delete(values: Form): Promise<void> {
     try {
-      this.loading = true;
       await this.heroService.delete(this.heroID);
       this.router.navigate(['heroes']);
       this.notificationService.show(`Se ha borrado el héroe ${values.name}`);
     } catch (error: any) {
       this.notificationService.show(error.message, 'error');
-    } finally {
-      this.loading = false;
     }
   }
 
-  private fromHeroModelDTO(values: HeroModelDTO): Form {
+  private fromHeroModel(values: HeroModel): Form {
     return <Form>{
       name: values.name,
       power: values.power,
@@ -153,11 +143,11 @@ export class HeroesFormPage implements OnInit {
     };
   }
 
-  private toHeroModelDTO(values: any): HeroModelDTO {
-    return <HeroModelDTO>{
+  private toHeroModel(values: any): HeroModel {
+    return {
       ...values,
       birth: values.birth.unix(),
-    };
+    } as HeroModel;
   }
 }
 interface Form {

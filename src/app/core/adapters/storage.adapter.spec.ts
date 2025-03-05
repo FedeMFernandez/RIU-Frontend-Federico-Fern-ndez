@@ -1,4 +1,3 @@
-import { fakeAsync } from "@angular/core/testing";
 import { StorageAdapter } from "./storage.adapter";
 
 describe('StorageAdapter', () => {

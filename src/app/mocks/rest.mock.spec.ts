@@ -1,6 +1,5 @@
 import { RestMock } from "src/app/mocks/rest.mock";
 import { LoadingSignal } from "../core/signals/loading.signal";
-import { threadSleep } from "../shared/functions/thread-sleep.function";
 
 describe('RestMock', () => {
 

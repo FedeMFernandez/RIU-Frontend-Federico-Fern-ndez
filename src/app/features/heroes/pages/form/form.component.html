@@ -10,7 +10,7 @@
             <mat-label>Nombre</mat-label>
             <input formControlName="name" textUppercase matInput type="text">
             @if (nameControl.dirty && nameControl.invalid) {
-              <mat-hint>Texto en mayúsculas, espacios y puntos.</mat-hint>
+              <mat-hint>Texto en mayúsculas, espacios, guiones medios y puntos.</mat-hint>
             }
             @if (nameControl.value.length) {
               <button type="button" matSuffix mat-icon-button aria-label="Clear" (click)="nameControl.setValue('')">
@@ -22,7 +22,7 @@
             <mat-label>Poder</mat-label>
             <input formControlName="power" matInput type="text">
             @if (powerControl.dirty && powerControl.invalid) {
-              <mat-hint>Solo texto, espacios y puntos.</mat-hint>
+              <mat-hint>Sólo texto, espacios, guiones medios y puntos.</mat-hint>
             }
             @if (powerControl.value.length) {
               <button type="button" matSuffix mat-icon-button aria-label="Clear" (click)="powerControl.setValue('')">
@@ -34,7 +34,7 @@
             <mat-label>Debilidad</mat-label>
             <input formControlName="weakness" matInput type="text">
             @if (weaknessControl.dirty && weaknessControl.invalid) {
-              <mat-hint>Solo texto, espacios y puntos.</mat-hint>
+              <mat-hint>Sólo texto, espacios, guiones medios y puntos.</mat-hint>
             }
             @if (weaknessControl.value.length) {
               <button type="button" matSuffix mat-icon-button aria-label="Clear" (click)="weaknessControl.setValue('')">
@@ -46,7 +46,7 @@
             <mat-label>Fecha de nacimiento</mat-label>
             <input formControlName="birth" matInput [matDatepicker]="picker">
             @if (birthControl.dirty && birthControl.invalid) {
-              <mat-hint>El formato debe ser {{ dateFormat }} y ser una fecha válida.</mat-hint>
+              <mat-hint>El formato debe ser {{ dateFormat }} y debe ser una fecha válida.</mat-hint>
             }
             <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
             <mat-datepicker #picker></mat-datepicker>
@@ -56,12 +56,12 @@
               <mat-icon>arrow_back</mat-icon>
               Cancelar
             </button>
-            <button type="submit" class="flex-grow-1" mat-raised-button extended [disabled]="form.invalid || loading" color="primary">
+            <button type="submit" class="flex-grow-1" mat-raised-button extended [disabled]="form.invalid || loading()" color="primary">
               <mat-icon>save</mat-icon>
               Guardar
             </button>
             @if (this.isEdition) {
-              <button type="button" mat-raised-button extended color="warn" [disabled]="loading" (click)="deleteEventHandler()">
+              <button type="button" mat-raised-button extended color="warn" [disabled]="loading()" (click)="deleteEventHandler()">
                 <mat-icon>delete</mat-icon>
                 Borrar
               </button>
