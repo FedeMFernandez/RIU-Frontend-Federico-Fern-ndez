@@ -1,0 +1,40 @@
+name: Build and deploy
+on:
+  push:
+    branches:
+      - feature/wrangler
+    paths:
+      - ".github/workflows/deployment.yaml"
+      - "**"
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    name: Deploy to Cloudflare Pages
+    steps:
+      - name: Checkout to Actions v4
+        uses: actions/checkout@v4
+
+      - name: SetUp Actions Node V4 wit Node Version 18.19.1
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.19.1'
+
+      - name: Install dependencies
+        run:
+          npm install
+
+      - name: Build
+        run:
+          npm run build
+
+      - name: Publish
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: "riu-frontend-federico-fern-ndez"
+          directory: "dist/challenge/browser"
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
