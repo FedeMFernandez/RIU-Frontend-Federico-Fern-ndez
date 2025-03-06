@@ -1,10 +1,11 @@
+name: Build and deploy
 on:
   push:
     branches:
       - feature/wrangler
     paths:
       - ".github/workflows/deployment.yaml"
-      - "**/challenge"
+      - "**"
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -13,18 +14,17 @@ jobs:
       deployments: write
     name: Deploy to Cloudflare Pages
     steps:
-      - name: Checkout
+      - name: Checkout to Actions v4
         uses: actions/checkout@v4
 
-      - name: SetUp Node
+      - name: SetUp Actions Node V4 wit Node Version 18.19.1
         uses: actions/setup-node@v4
         with:
           node-version: '18.19.1'
 
       - name: Install dependencies
-        working-directory: challenge
         run:
-          npm run build
+          npm install
 
       - name: Publish
         uses: cloudflare/pages-action@v1
