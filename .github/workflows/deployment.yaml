@@ -35,6 +35,6 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: "challenge"
+          projectName: "riu-frontend-federico-fern-ndez"
           directory: "dist/challenge/browser"
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}
