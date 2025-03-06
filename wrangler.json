@@ -9,6 +9,6 @@
     "deploy": "npx wrangler publish"
   },
   "site": {
-    "bucket": "./dist/mi-proyecto-angular/browser",
+    "bucket": "./dist/mi-proyecto-angular/browser"
   }
 }
